@@ -31,6 +31,12 @@ export default function AdminDashboard() {
   const [newCount, setNewCount] = useState(0);
 
   useEffect(() => {
+    // Verify user is admin
+    base44.auth.me().then((user) => {
+      if (!user || user.role !== "admin") {
+        window.location.href = "/login";
+      }
+    });
     loadCases();
 
     // Real-time subscription for new submissions
