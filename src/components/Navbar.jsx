@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, Phone } from "lucide-react";
+import { Menu, X, Phone, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -20,6 +20,7 @@ export default function Navbar() {
     { label: "Process", href: "#process" },
     { label: "Coverage", href: "#coverage" },
     { label: "Contact", href: "#contact" },
+    { label: "Submit Documents", href: "/submit", isPage: true },
   ];
 
   return (
@@ -45,15 +46,26 @@ export default function Navbar() {
             </Link>
 
             <div className="hidden lg:flex items-center gap-10">
-              {navLinks.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors tracking-wide uppercase"
-                >
-                  {link.label}
-                </a>
-              ))}
+              {navLinks.map((link) =>
+                link.isPage ? (
+                  <Link
+                    key={link.label}
+                    to={link.href}
+                    className="text-sm font-medium text-primary hover:text-primary/80 transition-colors tracking-wide uppercase flex items-center gap-1.5"
+                  >
+                    <Lock className="w-3.5 h-3.5" />
+                    {link.label}
+                  </Link>
+                ) : (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors tracking-wide uppercase"
+                  >
+                    {link.label}
+                  </a>
+                )
+              )}
             </div>
 
             <div className="hidden lg:flex items-center gap-4">
@@ -98,16 +110,28 @@ export default function Navbar() {
               </button>
             </div>
             <div className="flex flex-col items-start gap-8 px-6 pt-12">
-              {navLinks.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  onClick={() => setMobileOpen(false)}
-                  className="font-heading text-3xl font-medium text-foreground hover:text-primary transition-colors"
-                >
-                  {link.label}
-                </a>
-              ))}
+              {navLinks.map((link) =>
+                link.isPage ? (
+                  <Link
+                    key={link.label}
+                    to={link.href}
+                    onClick={() => setMobileOpen(false)}
+                    className="font-heading text-3xl font-medium text-primary hover:text-primary/80 transition-colors flex items-center gap-3"
+                  >
+                    <Lock className="w-6 h-6" />
+                    {link.label}
+                  </Link>
+                ) : (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    onClick={() => setMobileOpen(false)}
+                    className="font-heading text-3xl font-medium text-foreground hover:text-primary transition-colors"
+                  >
+                    {link.label}
+                  </a>
+                )
+              )}
               <a href="#contact" onClick={() => setMobileOpen(false)} className="w-full mt-4">
                 <Button className="w-full bg-primary text-primary-foreground text-lg py-6">
                   Request Service
