@@ -1,0 +1,85 @@
+{
+  "name": "Case",
+  "type": "object",
+  "properties": {
+    "case_number": {
+      "type": "string",
+      "description": "Client-provided case or file number"
+    },
+    "attorney": {
+      "type": "string",
+      "description": "Attorney or client name"
+    },
+    "firm": {
+      "type": "string",
+      "description": "Law firm or organization"
+    },
+    "email": {
+      "type": "string",
+      "description": "Client email address"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Client phone number"
+    },
+    "service_type": {
+      "type": "string",
+      "description": "Type of process service requested"
+    },
+    "county": {
+      "type": "string",
+      "description": "Utah county for service"
+    },
+    "respondent_name": {
+      "type": "string",
+      "description": "Name of the respondent/subject"
+    },
+    "respondent_address": {
+      "type": "string",
+      "description": "Known address of respondent"
+    },
+    "special_instructions": {
+      "type": "string",
+      "description": "Any special instructions for service"
+    },
+    "document_urls": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "description": "Array of uploaded document objects {name, url}"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "in_progress",
+        "delivered",
+        "failed"
+      ],
+      "default": "pending",
+      "description": "Current status of the case"
+    },
+    "submitted_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date and time the case was submitted"
+    },
+    "delivered_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date and time documents were delivered"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Internal admin notes"
+    }
+  },
+  "required": [
+    "attorney",
+    "email",
+    "service_type",
+    "county",
+    "respondent_name"
+  ]
+}

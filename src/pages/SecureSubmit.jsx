@@ -77,6 +77,23 @@ export default function SecureSubmit() {
         setUploading(false);
       }
 
+      // Save case to database
+      await base44.entities.Case.create({
+        case_number: formData.caseNumber,
+        attorney: formData.attorney,
+        firm: formData.firm,
+        email: formData.email,
+        phone: formData.phone,
+        service_type: formData.serviceType,
+        county: formData.county,
+        respondent_name: formData.respondentName,
+        respondent_address: formData.respondentAddress,
+        special_instructions: formData.specialInstructions,
+        document_urls: uploadedUrls,
+        status: "pending",
+        submitted_at: new Date().toISOString(),
+      });
+
       // Send confirmation email
       await base44.integrations.Core.SendEmail({
         to: formData.email,
