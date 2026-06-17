@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, FileText, ExternalLink, Save, Calendar } from "lucide-react";
+import { X, FileText, Download, Printer, Save, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -135,19 +135,35 @@ export default function CaseDetailModal({ caseData, onClose, onUpdate }) {
                 </p>
                 <div className="space-y-2">
                   {caseData.document_urls.map((doc, i) => (
-                    <a
+                    <div
                       key={i}
-                      href={doc.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-between bg-muted/30 border border-border rounded-lg px-4 py-2.5 hover:bg-muted/60 transition-colors"
+                      className="flex items-center justify-between bg-muted/30 border border-border rounded-lg px-4 py-2.5"
                     >
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 min-w-0">
                         <FileText className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-sm font-medium text-foreground">{doc.name}</span>
+                        <span className="text-sm font-medium text-foreground truncate">{doc.name}</span>
                       </div>
-                      <ExternalLink className="w-3.5 h-3.5 text-muted-foreground" />
-                    </a>
+                      <div className="flex items-center gap-1 ml-3 flex-shrink-0">
+                        <a
+                          href={doc.url}
+                          download={doc.name}
+                          title="Download"
+                          className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                        >
+                          <Download className="w-4 h-4" />
+                        </a>
+                        <button
+                          title="Print"
+                          onClick={() => {
+                            const win = window.open(doc.url, "_blank");
+                            win.onload = () => win.print();
+                          }}
+                          className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                        >
+                          <Printer className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>
