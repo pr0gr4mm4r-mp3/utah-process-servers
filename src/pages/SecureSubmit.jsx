@@ -271,7 +271,7 @@ Licensed & Bonded in Utah
             </div>
             <div className="grid sm:grid-cols-2 gap-6 bg-muted/30 border border-border rounded-xl p-6">
               <div>
-                <label className="text-sm font-medium text-foreground mb-2 block">Attorney Name *</label>
+                <label className="text-sm font-medium text-foreground mb-2 block">Attorney / Client Name *</label>
                 <Input required value={formData.attorney} onChange={(e) => setFormData({ ...formData, attorney: e.target.value })} placeholder="John Smith, Esq." className="bg-background" />
               </div>
               <div>
@@ -283,8 +283,8 @@ Licensed & Bonded in Utah
                 <Input required type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} placeholder="attorney@firm.com" className="bg-background" />
               </div>
               <div>
-                <label className="text-sm font-medium text-foreground mb-2 block">Phone Number</label>
-                <Input type="tel" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} placeholder="(801) 000-0000" className="bg-background" />
+                <label className="text-sm font-medium text-foreground mb-2 block">Phone Number *</label>
+                <Input required type="tel" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} placeholder="(801) 000-0000" className="bg-background" />
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground mb-2 block">Case / File Number</label>
