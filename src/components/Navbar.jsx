@@ -20,7 +20,7 @@ export default function Navbar() {
     { label: "Process", href: "#process" },
     { label: "Coverage", href: "#coverage" },
     { label: "Contact", href: "#contact" },
-    { label: "Submit Documents", href: "/submit", isPage: true },
+    { label: "Get Started", href: "/pricing", isPage: true },
   ];
 
   return (

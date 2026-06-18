@@ -23,6 +23,8 @@ export default function SecureSubmit() {
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [checkoutInfo, setCheckoutInfo] = useState(null);
+  const [checkingPayment, setCheckingPayment] = useState(true);
   const [formData, setFormData] = useState({
     caseNumber: "",
     attorney: "",
@@ -35,6 +37,21 @@ export default function SecureSubmit() {
     respondentAddress: "",
     specialInstructions: "",
   });
+
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('paid') === '1') {
+      const stored = localStorage.getItem('ups_checkout');
+      if (stored) {
+        const info = JSON.parse(stored);
+        setCheckoutInfo(info);
+        setFormData(prev => ({ ...prev, serviceType: info.serviceType }));
+        setCheckingPayment(false);
+        return;
+      }
+    }
+    window.location.href = '/pricing';
+  }, []);
 
   const utahCounties = [
     "Beaver", "Box Elder", "Cache", "Carbon", "Daggett", "Davis", "Duchesne",
@@ -90,6 +107,10 @@ export default function SecureSubmit() {
         respondent_address: formData.respondentAddress,
         special_instructions: formData.specialInstructions,
         document_urls: uploadedUrls,
+        checkout_id: checkoutInfo?.sessionId || "",
+        payment_status: "pending",
+        package_name: checkoutInfo?.packageName || "",
+        package_price: checkoutInfo?.packagePrice || "",
         status: "pending",
         submitted_at: new Date().toISOString(),
       });
@@ -120,6 +141,7 @@ Licensed & Bonded in Utah
       });
 
       setSubmitted(true);
+      localStorage.removeItem('ups_checkout');
     } catch (err) {
       toast.error("Submission failed. Please try again or call us directly.");
     } finally {
@@ -127,6 +149,14 @@ Licensed & Bonded in Utah
       setUploading(false);
     }
   };
+
+  if (checkingPayment) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="w-8 h-8 border-4 border-border border-t-primary rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   if (submitted) {
     return (
@@ -276,7 +306,7 @@ Licensed & Bonded in Utah
             <div className="grid sm:grid-cols-2 gap-6 bg-muted/30 border border-border rounded-xl p-6">
               <div>
                 <label className="text-sm font-medium text-foreground mb-2 block">Service Type *</label>
-                <Select required value={formData.serviceType} onValueChange={(val) => setFormData({ ...formData, serviceType: val })}>
+                <Select required value={formData.serviceType} onValueChange={(val) => !checkoutInfo && setFormData({ ...formData, serviceType: val })} disabled={!!checkoutInfo}>
                   <SelectTrigger className="bg-background"><SelectValue placeholder="Select service type" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Standard Service">Standard Service (3–5 days)</SelectItem>

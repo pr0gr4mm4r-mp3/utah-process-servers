@@ -9,6 +9,8 @@ import ScrollToTop from './components/ScrollToTop';
 import Home from '@/pages/Home';
 import SecureSubmit from '@/pages/SecureSubmit';
 import AdminDashboard from '@/pages/AdminDashboard';
+import Pricing from '@/pages/Pricing';
+import ThankYou from '@/pages/ThankYou';
 import Login from '@/pages/Login';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { Navigate } from 'react-router-dom';
@@ -42,6 +44,8 @@ const AuthenticatedApp = () => {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/submit" element={<SecureSubmit />} />
+      <Route path="/pricing" element={<Pricing />} />
+      <Route path="/thank-you" element={<ThankYou />} />
       <Route path="/login" element={<Login />} />
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
         <Route path="/admin" element={<AdminDashboard />} />

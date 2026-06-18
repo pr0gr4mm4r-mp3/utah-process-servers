@@ -60,6 +60,27 @@
       "default": "pending",
       "description": "Current status of the case"
     },
+    "checkout_id": {
+      "type": "string",
+      "description": "Wix Payments checkout session ID"
+    },
+    "payment_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "paid"
+      ],
+      "default": "pending",
+      "description": "Payment status from Wix Payments"
+    },
+    "package_name": {
+      "type": "string",
+      "description": "Name of the service package purchased"
+    },
+    "package_price": {
+      "type": "string",
+      "description": "Price paid for the service package"
+    },
     "submitted_at": {
       "type": "string",
       "format": "date-time",
