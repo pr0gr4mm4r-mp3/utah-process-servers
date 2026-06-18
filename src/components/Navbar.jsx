@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, Phone, Lock } from "lucide-react";
+import { Menu, X, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -69,14 +69,7 @@ export default function Navbar() {
             </div>
 
             <div className="hidden lg:flex items-center gap-4">
-              <a
-                href="tel:+18015555555"
-                className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <Phone className="w-4 h-4" />
-                (801) 555-5555
-              </a>
-              <a href="#contact">
+<a href="#contact">
                 <Button className="bg-primary text-primary-foreground hover:bg-primary/90 font-medium tracking-wide text-sm px-6">
                   Request Service
                 </Button>
@@ -137,13 +130,7 @@ export default function Navbar() {
                   Request Service
                 </Button>
               </a>
-              <a
-                href="tel:+18015555555"
-                className="flex items-center gap-2 text-muted-foreground mt-4"
-              >
-                <Phone className="w-5 h-5" />
-                (801) 555-5555
-              </a>
+
             </div>
           </motion.div>
         )}
