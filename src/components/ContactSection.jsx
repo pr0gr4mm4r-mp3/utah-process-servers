@@ -57,9 +57,9 @@ export default function ContactSection() {
 
             <div className="mt-12 space-y-6">
               {[
-                { icon: Phone, label: "(801) 555-5555", sub: "Mon–Sat, 7AM–9PM" },
-                { icon: Mail, label: "service@utahprocessservers.com", sub: "Secure email" },
-                { icon: MapPin, label: "Salt Lake City, Utah", sub: "Serving all 29 counties" },
+                { icon: Phone, label: "(801) 755-5445", sub: "Mon–Sat, 7AM–9PM" },
+                { icon: Mail, label: "utahproservers@yahoo.com", sub: "Secure email" },
+                { icon: MapPin, label: "4448 Loren Von Dr., Millcreek, UT 84124", sub: "Serving all 29 counties" },
                 { icon: Clock, label: "< 1 Hour Response", sub: "During business hours" },
               ].map((item) => (
                 <div key={item.label} className="flex items-start gap-4">

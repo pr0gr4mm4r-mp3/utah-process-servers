@@ -104,9 +104,9 @@ export default function Footer() {
               Contact
             </p>
             <ul className="space-y-3 text-sm text-white/50">
-              <li>(801) 555-5555</li>
-              <li>service@utahprocessservers.com</li>
-              <li>Salt Lake City, Utah 84101</li>
+              <li>(801) 755-5445</li>
+              <li>utahproservers@yahoo.com</li>
+              <li>4448 Loren Von Dr., Millcreek, UT 84124</li>
               <li className="pt-2 text-white/35">Mon – Sat: 7:00 AM – 9:00 PM</li>
               <li className="text-white/35">Emergency service available</li>
             </ul>
