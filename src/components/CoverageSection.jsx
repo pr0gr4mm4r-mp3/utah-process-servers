@@ -1,13 +1,12 @@
 import React from "react";
 import { motion } from "framer-motion";
 
-const counties = [
-  "Beaver", "Box Elder", "Cache", "Carbon", "Daggett",
-  "Davis", "Duchesne", "Emery", "Garfield", "Grand",
-  "Iron", "Juab", "Kane", "Millard", "Morgan",
-  "Piute", "Rich", "Salt Lake", "San Juan", "Sanpete",
-  "Sevier", "Summit", "Tooele", "Uintah", "Utah",
-  "Wasatch", "Washington", "Wayne", "Weber",
+const cities = [
+  "Salt Lake City", "West Valley City", "Murray", "Millcreek",
+  "Holladay", "Cottonwood Heights", "Sandy", "South Jordan",
+  "West Jordan", "Midvale", "Taylorsville", "Kearns",
+  "Herriman", "Riverton", "Draper", "Bluffdale",
+  "South Salt Lake", "Magna", "Copperton",
 ];
 
 export default function CoverageSection() {
@@ -17,7 +16,7 @@ export default function CoverageSection() {
       <div className="absolute inset-0">
         <img
           src="https://media.base44.com/images/public/6a299aad37fb205f9d6f40a2/66d1d617c_generated_2069730a.png"
-          alt="Aerial view of Utah Bonneville Salt Flats at dawn"
+          alt="Aerial view of Salt Lake Valley"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-[#1A1C1E]/85 via-[#1A1C1E]/90 to-[#1A1C1E]/95" />
@@ -35,27 +34,27 @@ export default function CoverageSection() {
             Service Area
           </p>
           <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight">
-            All 29 Utah Counties. No Exceptions.
+            The Salt Lake Valley — Fully Covered.
           </h2>
           <p className="mt-6 text-white/55 text-lg leading-relaxed">
-            From the Wasatch Front to the Colorado Plateau, we maintain
-            experienced servers in every judicial district across the state.
+            We serve every city, municipality, and unincorporated area within
+            Salt Lake County with same-day and rush options available.
           </p>
         </motion.div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-8 gap-y-4">
-          {counties.map((county, i) => (
+          {cities.map((city, i) => (
             <motion.div
-              key={county}
+              key={city}
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.3, delay: i * 0.02 }}
+              transition={{ duration: 0.3, delay: i * 0.03 }}
               className="flex items-center gap-2 group"
             >
               <div className="w-1 h-1 rounded-full bg-[#C4A265]/50 group-hover:bg-[#C4A265] transition-colors" />
               <span className="text-sm text-white/60 group-hover:text-white transition-colors font-medium">
-                {county} County
+                {city}
               </span>
             </motion.div>
           ))}
@@ -71,16 +70,16 @@ export default function CoverageSection() {
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
-                title: "Wasatch Front",
-                desc: "Salt Lake, Davis, Utah, Weber — same-day service available",
+                title: "Salt Lake City & Urban Core",
+                desc: "Downtown SLC, South Salt Lake, Murray — priority same-day service",
               },
               {
-                title: "Southern Utah",
-                desc: "Washington, Iron, Kane, Garfield — dedicated regional servers",
+                title: "South Valley",
+                desc: "Sandy, Draper, South Jordan, Riverton, Herriman — full coverage",
               },
               {
-                title: "Rural & Remote",
-                desc: "All remaining counties serviced within standard timelines",
+                title: "West Valley & Suburbs",
+                desc: "West Valley City, Taylorsville, Kearns, Magna — rapid turnaround",
               },
             ].map((region) => (
               <div

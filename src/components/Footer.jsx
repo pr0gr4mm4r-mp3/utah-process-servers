@@ -1,15 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const counties = [
-  "Beaver", "Box Elder", "Cache", "Carbon", "Daggett",
-  "Davis", "Duchesne", "Emery", "Garfield", "Grand",
-  "Iron", "Juab", "Kane", "Millard", "Morgan",
-  "Piute", "Rich", "Salt Lake", "San Juan", "Sanpete",
-  "Sevier", "Summit", "Tooele", "Uintah", "Utah",
-  "Wasatch", "Washington", "Wayne", "Weber",
-];
-
 export default function Footer() {
   return (
     <footer className="bg-[#1A1C1E] text-white">
@@ -29,7 +20,7 @@ export default function Footer() {
             <p className="text-white/45 max-w-md text-sm leading-relaxed">
               Licensed and bonded process serving professionals. Delivering legal
               documents with precision, compliance, and unwavering reliability
-              across the state of Utah.
+              throughout the Salt Lake Valley.
             </p>
           </div>
           <div className="flex gap-6 text-sm">
@@ -110,20 +101,6 @@ export default function Footer() {
               <li className="pt-2 text-white/35">Mon – Sat: 7:00 AM – 9:00 PM</li>
               <li className="text-white/35">Emergency service available</li>
             </ul>
-          </div>
-        </div>
-
-        {/* All counties */}
-        <div className="py-12 border-b border-white/10">
-          <p className="text-xs tracking-[0.2em] uppercase text-white/25 font-semibold mb-6">
-            Serving All Utah Counties
-          </p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-x-8 gap-y-2">
-            {counties.map((c) => (
-              <span key={c} className="text-xs text-white/30">
-                {c}
-              </span>
-            ))}
           </div>
         </div>
 

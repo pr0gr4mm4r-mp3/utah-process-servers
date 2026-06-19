@@ -59,7 +59,7 @@ export default function ContactSection() {
               {[
                 { icon: Phone, label: "(801) 755-5445", sub: "Mon–Sat, 7AM–9PM" },
                 { icon: Mail, label: "utahproservers@yahoo.com", sub: "Secure email" },
-                { icon: MapPin, label: "4448 Loren Von Dr., Millcreek, UT 84124", sub: "Serving all 29 counties" },
+                { icon: MapPin, label: "4448 Loren Von Dr., Millcreek, UT 84124", sub: "Serving the Salt Lake Valley" },
                 { icon: Clock, label: "< 1 Hour Response", sub: "During business hours" },
               ].map((item) => (
                 <div key={item.label} className="flex items-start gap-4">
@@ -161,7 +161,7 @@ export default function ContactSection() {
                 <Textarea
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  placeholder="Briefly describe your service needs, including county and any time constraints..."
+                  placeholder="Briefly describe your service needs, including city/area and any time constraints..."
                   className="bg-background min-h-[120px]"
                 />
               </div>

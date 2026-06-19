@@ -39,7 +39,7 @@ export default function HeroSection() {
 
             <p className="mt-8 text-lg text-white/60 max-w-lg leading-relaxed font-light">
               Utah's premier process serving firm. We deliver legal documents with
-              the accuracy, speed, and compliance your case demands — statewide.
+              the accuracy, speed, and compliance your case demands — throughout the Salt Lake Valley.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 mt-10">
@@ -86,8 +86,8 @@ export default function HeroSection() {
                   },
                   {
                     icon: MapPin,
-                    title: "All 29 Utah Counties",
-                    desc: "Complete statewide coverage, no exceptions",
+                    title: "Salt Lake Valley",
+                    desc: "Complete coverage across all Salt Lake County cities",
                   },
                 ].map((item) => (
                   <div
@@ -123,7 +123,7 @@ export default function HeroSection() {
             {[
               { value: "15,000+", label: "Documents Served" },
               { value: "99.4%", label: "Success Rate" },
-              { value: "29", label: "Counties Covered" },
+              { value: "SLV", label: "Salt Lake Valley" },
               { value: "24hr", label: "Avg. Turnaround" },
             ].map((stat) => (
               <div key={stat.label} className="text-center md:text-left">
