@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { FileText, Search, Users, Building2, Scale, Gavel } from "lucide-react";
+import { FileText, Users, Building2, Scale, Gavel } from "lucide-react";
 
 const services = [
   {
@@ -8,12 +8,6 @@ const services = [
     title: "Standard Process Service",
     description:
       "Personal service of summons, complaints, subpoenas, and all civil documents in compliance with Utah Rule 4.",
-  },
-  {
-    icon: Search,
-    title: "Skip Tracing",
-    description:
-      "Advanced locate services when a party cannot be found at their last known address. We find them.",
   },
   {
     icon: Users,

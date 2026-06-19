@@ -53,7 +53,6 @@ export default function Footer() {
               {[
                 "Standard Process Service",
                 "Rush & Same-Day Service",
-                "Skip Tracing & Locate",
                 "Substitute Service",
                 "Corporate Service",
                 "Court Filings",
