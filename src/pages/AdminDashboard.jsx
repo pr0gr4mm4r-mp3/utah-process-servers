@@ -2,12 +2,13 @@ import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Bell, LogOut, FileText, Clock, CheckCircle, AlertCircle, ChevronRight, Search } from "lucide-react";
+import { Bell, LogOut, FileText, Clock, CheckCircle, AlertCircle, ChevronRight, Search, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import CaseRow from "@/components/admin/CaseRow";
 import CaseDetailModal from "@/components/admin/CaseDetailModal";
+import InviteUserModal from "@/components/admin/InviteUserModal";
 
 const TABS = [
   { key: "submitted", label: "By Date Submitted" },
@@ -29,6 +30,7 @@ export default function AdminDashboard() {
   const [search, setSearch] = useState("");
   const [selectedCase, setSelectedCase] = useState(null);
   const [newCount, setNewCount] = useState(0);
+  const [showInvite, setShowInvite] = useState(false);
 
   useEffect(() => {
     // Verify user is admin
@@ -136,6 +138,13 @@ export default function AdminDashboard() {
               {newCount} new submission{newCount > 1 ? "s" : ""}
             </button>
           )}
+          <button
+            onClick={() => setShowInvite(true)}
+            className="flex items-center gap-1.5 text-white/40 hover:text-white text-sm transition-colors"
+          >
+            <UserPlus className="w-4 h-4" />
+            Invite User
+          </button>
           <Link to="/" className="text-white/40 hover:text-white text-sm transition-colors">
             View Site
           </Link>
@@ -235,6 +244,8 @@ export default function AdminDashboard() {
           )}
         </div>
       </div>
+
+      {showInvite && <InviteUserModal onClose={() => setShowInvite(false)} />}
 
       {selectedCase && (
         <CaseDetailModal
