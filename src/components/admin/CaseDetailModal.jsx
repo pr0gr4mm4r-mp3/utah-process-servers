@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, FileText, Download, Printer, Save, Calendar } from "lucide-react";
+import { X, FileText, Download, Printer, Save, Calendar, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -28,6 +28,15 @@ export default function CaseDetailModal({ caseData, onClose, onUpdate }) {
     caseData.delivered_at ? caseData.delivered_at.slice(0, 16) : ""
   );
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    if (!window.confirm("Are you sure you want to delete this case? This cannot be undone.")) return;
+    setDeleting(true);
+    await base44.entities.Case.delete(caseData.id);
+    toast.success("Case deleted");
+    onClose();
+  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -193,16 +202,18 @@ export default function CaseDetailModal({ caseData, onClose, onUpdate }) {
               />
             </div>
 
-            <div className="flex justify-end gap-3 pt-2">
-              <Button variant="outline" onClick={onClose}>Cancel</Button>
-              <Button onClick={handleSave} disabled={saving} className="bg-primary gap-2">
-                {saving ? (
-                  <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                ) : (
-                  <Save className="w-4 h-4" />
-                )}
-                Save Changes
+            <div className="flex justify-between items-center pt-2">
+              <Button variant="destructive" onClick={handleDelete} disabled={deleting} className="gap-2">
+                {deleting ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                Delete Case
               </Button>
+              <div className="flex gap-3">
+                <Button variant="outline" onClick={onClose}>Cancel</Button>
+                <Button onClick={handleSave} disabled={saving} className="bg-primary gap-2">
+                  {saving ? <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" /> : <Save className="w-4 h-4" />}
+                  Save Changes
+                </Button>
+              </div>
             </div>
           </div>
         </motion.div>
