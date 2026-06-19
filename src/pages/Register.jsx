@@ -1,22 +1,187 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { ShieldX } from "lucide-react";
+import { base44 } from "@/api/base44Client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { UserPlus, Mail, Lock, ShieldCheck, Loader2 } from "lucide-react";
 import AuthLayout from "@/components/AuthLayout";
 
+const STEP_REGISTER = "register";
+const STEP_VERIFY = "verify";
+
 export default function Register() {
+  const [step, setStep] = useState(STEP_REGISTER);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [otp, setOtp] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters.");
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await base44.auth.register({ email, password });
+      setStep(STEP_VERIFY);
+    } catch (err) {
+      setError(err.message || "Registration failed. Please ensure your email was invited.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerify = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      await base44.auth.verifyOtp({ email, otpCode: otp });
+      await base44.auth.loginViaEmailPassword(email, password);
+      window.location.href = "/admin";
+    } catch (err) {
+      setError(err.message || "Invalid verification code. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (step === STEP_VERIFY) {
+    return (
+      <AuthLayout
+        icon={ShieldCheck}
+        title="Verify Your Email"
+        subtitle={`A verification code was sent to ${email}`}
+      >
+        {error && (
+          <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
+            {error}
+          </div>
+        )}
+        <form onSubmit={handleVerify} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="otp">Verification Code</Label>
+            <Input
+              id="otp"
+              type="text"
+              inputMode="numeric"
+              autoFocus
+              placeholder="Enter 6-digit code"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              className="h-12 text-center text-lg tracking-widest"
+              required
+            />
+          </div>
+          <Button type="submit" className="w-full h-12 font-medium" disabled={loading}>
+            {loading ? (
+              <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Verifying...</>
+            ) : (
+              "Verify & Access Portal"
+            )}
+          </Button>
+          <p className="text-center text-xs text-muted-foreground">
+            Didn't receive a code?{" "}
+            <button
+              type="button"
+              className="text-primary hover:underline"
+              onClick={() => { setStep(STEP_REGISTER); setError(""); setOtp(""); }}
+            >
+              Go back
+            </button>
+          </p>
+        </form>
+      </AuthLayout>
+    );
+  }
+
   return (
     <AuthLayout
-      icon={ShieldX}
-      title="Registration Disabled"
-      subtitle="Self-registration is not permitted for this application"
+      icon={UserPlus}
+      title="Create Your Account"
+      subtitle="Set a secure password to access the admin portal"
     >
-      <div className="p-4 rounded-lg bg-destructive/10 text-destructive text-sm text-center mb-6">
-        Access is restricted to authorized Utah Process Servers personnel only.
-        New accounts must be provisioned by an administrator.
-      </div>
-      <Link to="/login" className="block text-center text-sm text-primary font-medium hover:underline">
-        ← Back to Login
-      </Link>
+      {error && (
+        <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
+          {error}
+        </div>
+      )}
+      <form onSubmit={handleRegister} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="email">Email Address</Label>
+          <div className="relative">
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              id="email"
+              type="email"
+              autoComplete="email"
+              autoFocus
+              placeholder="you@firm.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="pl-10 h-12"
+              required
+            />
+          </div>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="password">Password</Label>
+          <div className="relative">
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              id="password"
+              type="password"
+              autoComplete="new-password"
+              placeholder="Min. 8 characters"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="pl-10 h-12"
+              required
+            />
+          </div>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="confirmPassword">Confirm Password</Label>
+          <div className="relative">
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              id="confirmPassword"
+              type="password"
+              autoComplete="new-password"
+              placeholder="Re-enter password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="pl-10 h-12"
+              required
+            />
+          </div>
+        </div>
+        <Button type="submit" className="w-full h-12 font-medium" disabled={loading}>
+          {loading ? (
+            <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Creating Account...</>
+          ) : (
+            "Create Account"
+          )}
+        </Button>
+      </form>
+      <p className="text-center text-xs text-muted-foreground mt-6">
+        Already have an account?{" "}
+        <Link to="/login" className="text-primary hover:underline">
+          Log in
+        </Link>
+      </p>
     </AuthLayout>
   );
 }

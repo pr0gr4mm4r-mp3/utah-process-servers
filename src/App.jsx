@@ -12,6 +12,7 @@ import AdminDashboard from '@/pages/AdminDashboard';
 import Pricing from '@/pages/Pricing';
 import ThankYou from '@/pages/ThankYou';
 import Login from '@/pages/Login';
+import Register from '@/pages/Register';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { Navigate } from 'react-router-dom';
 // Add page imports here
@@ -47,6 +48,7 @@ const AuthenticatedApp = () => {
       <Route path="/pricing" element={<Pricing />} />
       <Route path="/thank-you" element={<ThankYou />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
         <Route path="/admin" element={<AdminDashboard />} />
       </Route>
