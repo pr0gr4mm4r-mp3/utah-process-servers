@@ -18,7 +18,7 @@ const PACKAGES = [
   {
     id: "rush",
     name: "Rush Service",
-    price: "135.00",
+    price: "160.00",
     turnaround: "24 hours",
     description: "Priority handling for time-sensitive legal deadlines",
     features: ["24-hour turnaround", "Real-time status updates", "Priority server assignment"],
@@ -28,7 +28,7 @@ const PACKAGES = [
   {
     id: "same_day",
     name: "Same-Day Service",
-    price: "185.00",
+    price: "250.00",
     turnaround: "Same day",
     description: "Urgent same-day service for critical filings",
     features: ["Same-day completion", "Dedicated process server", "Immediate confirmation"],
