@@ -56,11 +56,10 @@ export default function ServicesSection() {
             Our Services
           </p>
           <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold text-foreground leading-tight">
-            Comprehensive Legal Document Services
+            Salt Lake Valley Process Serving & Legal Document Services
           </h2>
           <p className="mt-6 text-muted-foreground text-lg leading-relaxed">
-            From routine civil process to complex skip traces, we handle every aspect
-            of legal document delivery with meticulous care.
+            From routine civil process to complex skip traces, we handle every aspect of legal document delivery across Salt Lake City, Millcreek, Sandy, West Valley, and all of Salt Lake County.
           </p>
         </motion.div>
 

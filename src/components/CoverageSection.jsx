@@ -16,7 +16,7 @@ export default function CoverageSection() {
       <div className="absolute inset-0">
         <img
           src="https://media.base44.com/images/public/6a299aad37fb205f9d6f40a2/66d1d617c_generated_2069730a.png"
-          alt="Aerial view of Salt Lake Valley"
+          alt="Aerial view of the Salt Lake Valley — Utah Process Servers coverage area"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-[#1A1C1E]/85 via-[#1A1C1E]/90 to-[#1A1C1E]/95" />
