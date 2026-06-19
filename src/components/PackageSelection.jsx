@@ -9,10 +9,10 @@ const PACKAGES = [
   {
     id: "standard",
     name: "Standard Service",
-    price: "85.00",
-    turnaround: "3–5 business days",
-    description: "Reliable process service for non-urgent matters",
-    features: ["Certified proof of service", "GPS-verified attempts", "Email confirmation"],
+    price: "80.00",
+    turnaround: "Up to 3 days",
+    description: "Three documented service attempts over three consecutive days, with certified proof of service upon completion.",
+    features: ["Three attempts over three days", "Certified proof of service", "Email confirmation"],
     serviceType: "Standard Service",
   },
   {
@@ -33,14 +33,6 @@ const PACKAGES = [
     description: "Urgent same-day service for critical filings",
     features: ["Same-day completion", "Dedicated process server", "Immediate confirmation"],
     serviceType: "Same-Day Service",
-  },
-  {
-    id: "skip_trace",
-    name: "Skip Tracing & Locate",
-    price: "175.00",
-    turnaround: "Varies",
-    description: "Locate hard-to-find respondents using advanced methods",
-    serviceType: "Skip Tracing",
   },
   {
     id: "substitute",
