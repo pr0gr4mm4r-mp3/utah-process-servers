@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
-import { Check, Clock, Loader2 } from "lucide-react";
+import { Check, Clock } from "lucide-react";
 import { motion } from "framer-motion";
-import { toast } from "sonner";
+import PaymentMethodSelector from "@/components/PaymentMethodSelector";
 
 const PACKAGES = [
   {
@@ -79,31 +78,7 @@ const PACKAGES = [
 const FEATURED_IDS = ["standard", "rush", "same_day"];
 
 export default function PackageSelection() {
-  const [loadingId, setLoadingId] = useState(null);
-
-  const handleSelect = async (pkg) => {
-    setLoadingId(pkg.id);
-    try {
-      const response = await base44.functions.invoke("createCheckout", {
-        packageName: pkg.name,
-        packagePrice: pkg.price,
-      });
-
-      const { redirectUrl, sessionId } = response.data;
-
-      localStorage.setItem("ups_checkout", JSON.stringify({
-        sessionId,
-        packageName: pkg.name,
-        packagePrice: pkg.price,
-        serviceType: pkg.serviceType,
-      }));
-
-      window.location.href = redirectUrl;
-    } catch (error) {
-      toast.error("Unable to start checkout. Please try again.");
-      setLoadingId(null);
-    }
-  };
+  const [selectedPkg, setSelectedPkg] = useState(null);
 
   const featured = PACKAGES.filter(p => FEATURED_IDS.includes(p.id));
   const additional = PACKAGES.filter(p => !FEATURED_IDS.includes(p.id));
@@ -158,12 +133,11 @@ export default function PackageSelection() {
                 ))}
               </ul>
               <Button
-                onClick={() => handleSelect(pkg)}
-                disabled={loadingId !== null}
+                onClick={() => setSelectedPkg(pkg)}
                 className={`w-full py-5 font-semibold ${pkg.popular ? "bg-primary text-primary-foreground" : ""}`}
                 variant={pkg.popular ? "default" : "outline"}
               >
-                {loadingId === pkg.id ? <Loader2 className="w-4 h-4 animate-spin" /> : "Select & Pay"}
+                Select & Pay
               </Button>
             </motion.div>
           ))}
@@ -193,10 +167,9 @@ export default function PackageSelection() {
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => handleSelect(pkg)}
-                    disabled={loadingId !== null}
+                    onClick={() => setSelectedPkg(pkg)}
                   >
-                    {loadingId === pkg.id ? <Loader2 className="w-3 h-3 animate-spin" /> : "Select"}
+                    Select
                   </Button>
                 </div>
               </motion.div>
@@ -204,6 +177,10 @@ export default function PackageSelection() {
           </div>
         </div>
       </div>
+
+      {selectedPkg && (
+        <PaymentMethodSelector pkg={selectedPkg} onClose={() => setSelectedPkg(null)} />
+      )}
     </div>
   );
 }

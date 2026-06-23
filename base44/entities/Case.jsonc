@@ -62,7 +62,7 @@
     },
     "checkout_id": {
       "type": "string",
-      "description": "Wix Payments checkout session ID"
+      "description": "Checkout session ID"
     },
     "payment_status": {
       "type": "string",
@@ -71,7 +71,24 @@
         "paid"
       ],
       "default": "pending",
-      "description": "Payment status from Wix Payments"
+      "description": "Payment status"
+    },
+    "payment_method": {
+      "type": "string",
+      "enum": [
+        "stripe",
+        "paypal",
+        "zelle",
+        "venmo",
+        "base44",
+        "other"
+      ],
+      "description": "Payment method used"
+    },
+    "payment_received": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether payment has been received and verified by admin"
     },
     "package_name": {
       "type": "string",

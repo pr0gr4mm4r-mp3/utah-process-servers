@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, FileText, Download, Printer, Save, Calendar, Trash2 } from "lucide-react";
+import { X, FileText, Download, Printer, Save, Calendar, Trash2, CreditCard, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -21,12 +21,22 @@ const STATUS_STYLES = {
   failed: "bg-red-50 text-red-700",
 };
 
+const PAYMENT_METHOD_LABELS = {
+  stripe: "Credit / Debit Card (Stripe)",
+  paypal: "PayPal",
+  zelle: "Zelle",
+  venmo: "Venmo",
+  base44: "Base44 Payments",
+  other: "Other",
+};
+
 export default function CaseDetailModal({ caseData, onClose, onUpdate }) {
   const [status, setStatus] = useState(caseData.status || "pending");
   const [notes, setNotes] = useState(caseData.notes || "");
   const [deliveredAt, setDeliveredAt] = useState(
     caseData.delivered_at ? caseData.delivered_at.slice(0, 16) : ""
   );
+  const [paymentReceived, setPaymentReceived] = useState(caseData.payment_received || false);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -43,6 +53,8 @@ export default function CaseDetailModal({ caseData, onClose, onUpdate }) {
     const updated = await base44.entities.Case.update(caseData.id, {
       status,
       notes,
+      payment_received: paymentReceived,
+      payment_status: paymentReceived ? "paid" : "pending",
       delivered_at: deliveredAt ? new Date(deliveredAt).toISOString() : null,
     });
     onUpdate(updated);
@@ -177,6 +189,52 @@ export default function CaseDetailModal({ caseData, onClose, onUpdate }) {
                 </div>
               </div>
             )}
+
+            {/* Payment info */}
+            <div>
+              <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold mb-3">Payment</p>
+              <div className="grid grid-cols-2 gap-3 text-sm mb-4">
+                <div>
+                  <p className="text-muted-foreground text-xs mb-0.5">Method</p>
+                  <div className="flex items-center gap-1.5 font-medium text-foreground">
+                    <CreditCard className="w-3.5 h-3.5 text-muted-foreground" />
+                    {PAYMENT_METHOD_LABELS[caseData.payment_method] || "—"}
+                  </div>
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-xs mb-0.5">Amount</p>
+                  <p className="font-medium text-foreground">
+                    {caseData.package_price ? `$${parseFloat(caseData.package_price).toFixed(2)}` : "—"}
+                    {caseData.package_name ? <span className="text-muted-foreground text-xs ml-1">({caseData.package_name})</span> : null}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center justify-between bg-muted/30 border border-border rounded-xl px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <DollarSign className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm font-medium text-foreground">Payment Received</span>
+                  {paymentReceived && (
+                    <span className="text-xs bg-green-100 text-green-700 border border-green-200 px-2 py-0.5 rounded-full font-medium">Verified</span>
+                  )}
+                  {!paymentReceived && (
+                    <span className="text-xs bg-yellow-50 text-yellow-700 border border-yellow-200 px-2 py-0.5 rounded-full font-medium">Pending</span>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setPaymentReceived(!paymentReceived)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+                    paymentReceived ? "bg-green-500" : "bg-gray-200"
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                      paymentReceived ? "translate-x-6" : "translate-x-1"
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
 
             {/* Status + notes */}
             <div>

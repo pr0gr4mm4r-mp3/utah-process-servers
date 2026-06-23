@@ -225,11 +225,12 @@ export default function AdminDashboard() {
           ) : (
             <div>
               {/* Header row */}
-              <div className="grid grid-cols-[1fr_1.5fr_1fr_1fr_1fr_40px] gap-4 px-6 py-3 border-b border-border bg-muted/30 text-xs text-muted-foreground uppercase tracking-wide font-medium">
+              <div className="grid grid-cols-[1fr_1.5fr_1fr_1fr_1fr_1fr_40px] gap-4 px-6 py-3 border-b border-border bg-muted/30 text-xs text-muted-foreground uppercase tracking-wide font-medium">
                 <span>Case #</span>
                 <span>Attorney / Respondent</span>
                 <span>Service Type</span>
                 <span>Status</span>
+                <span>Payment</span>
                 <span>Submitted</span>
                 <span />
               </div>

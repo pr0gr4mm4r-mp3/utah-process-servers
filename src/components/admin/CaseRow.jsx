@@ -1,5 +1,5 @@
 import React from "react";
-import { ChevronRight, FileText } from "lucide-react";
+import { ChevronRight, FileText, DollarSign } from "lucide-react";
 import { format } from "date-fns";
 
 const STATUS_STYLES = {
@@ -19,10 +19,19 @@ const STATUS_LABELS = {
 export default function CaseRow({ caseData: c, onClick }) {
   const submittedDate = c.submitted_at || c.created_date;
 
+  const paymentMethodLabel = {
+    stripe: "Card",
+    paypal: "PayPal",
+    zelle: "Zelle",
+    venmo: "Venmo",
+    base44: "Base44",
+    other: "Other",
+  };
+
   return (
     <button
       onClick={onClick}
-      className="w-full grid grid-cols-[1fr_1.5fr_1fr_1fr_1fr_40px] gap-4 px-6 py-4 border-b border-border/50 hover:bg-muted/20 transition-colors text-left items-center"
+      className="w-full grid grid-cols-[1fr_1.5fr_1fr_1fr_1fr_1fr_40px] gap-4 px-6 py-4 border-b border-border/50 hover:bg-muted/20 transition-colors text-left items-center"
     >
       <span className="text-sm font-mono text-foreground truncate">
         {c.case_number || <span className="text-muted-foreground italic">—</span>}
@@ -37,6 +46,15 @@ export default function CaseRow({ caseData: c, onClick }) {
           {STATUS_LABELS[c.status] || "Pending"}
         </span>
       </span>
+      <div className="flex flex-col gap-1">
+        <span className="text-xs text-muted-foreground">
+          {c.payment_method ? paymentMethodLabel[c.payment_method] || c.payment_method : "—"}
+        </span>
+        <span className={`inline-flex items-center gap-1 text-xs font-medium ${c.payment_received ? "text-green-600" : "text-yellow-600"}`}>
+          <DollarSign className="w-3 h-3" />
+          {c.payment_received ? "Paid" : "Pending"}
+        </span>
+      </div>
       <span className="text-xs text-muted-foreground">
         {submittedDate ? format(new Date(submittedDate), "MMM d, yyyy") : "—"}
       </span>

@@ -50,6 +50,12 @@ export default function SecureSubmit() {
         return;
       }
     }
+    // Also allow zelle/venmo flow from manual payment page
+    const method = params.get('method');
+    if (method === 'zelle' || method === 'venmo') {
+      setCheckingPayment(false);
+      return;
+    }
     window.location.href = '/pricing';
   }, []);
 
@@ -108,7 +114,9 @@ export default function SecureSubmit() {
         special_instructions: formData.specialInstructions,
         document_urls: uploadedUrls,
         checkout_id: checkoutInfo?.sessionId || "",
-        payment_status: "pending",
+        payment_status: checkoutInfo?.paymentMethod === "stripe" || checkoutInfo?.paymentMethod === "paypal" ? "paid" : "pending",
+        payment_method: checkoutInfo?.paymentMethod || new URLSearchParams(window.location.search).get("method") || "other",
+        payment_received: checkoutInfo?.paymentMethod === "stripe" || checkoutInfo?.paymentMethod === "paypal",
         package_name: checkoutInfo?.packageName || "",
         package_price: checkoutInfo?.packagePrice || "",
         status: "pending",
