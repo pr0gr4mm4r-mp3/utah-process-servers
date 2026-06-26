@@ -14,9 +14,19 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const ALLOWED_EMAILS = ["livevertechal@gmail.com"];
+
+  const isEmailAllowed = (email) => {
+    return email.endsWith("@utahproservers.com") || ALLOWED_EMAILS.includes(email.toLowerCase());
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    if (!isEmailAllowed(email)) {
+      setError("Access is restricted to authorized Utah Process Servers personnel only.");
+      return;
+    }
     setLoading(true);
     try {
       await base44.auth.loginViaEmailPassword(email, password);
