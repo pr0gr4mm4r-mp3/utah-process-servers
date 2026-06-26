@@ -50,6 +50,7 @@ export default function CaseDetailModal({ caseData, onClose, onUpdate }) {
 
   const handleSave = async () => {
     setSaving(true);
+    const wasNotPaid = !caseData.payment_received;
     const updated = await base44.entities.Case.update(caseData.id, {
       status,
       notes,
@@ -57,8 +58,32 @@ export default function CaseDetailModal({ caseData, onClose, onUpdate }) {
       payment_status: paymentReceived ? "paid" : "pending",
       delivered_at: deliveredAt ? new Date(deliveredAt).toISOString() : null,
     });
+
+    // Send free email notification when payment is newly marked as received
+    if (paymentReceived && wasNotPaid && caseData.email) {
+      await base44.integrations.Core.SendEmail({
+        to: caseData.email,
+        subject: `Payment Confirmed — Your Case is Now Active`,
+        body: `Dear ${caseData.attorney || "Valued Client"},
+
+Your payment has been received and verified by Utah Process Servers. Your case is now active and service will begin promptly.
+
+Case Details:
+- Case Number: ${caseData.case_number || "N/A"}
+- Service Type: ${caseData.service_type}
+- Respondent: ${caseData.respondent_name}
+
+If you have any questions, please call us at (801) 755-5445 or reply to this email.
+
+Utah Process Servers
+Licensed & Bonded in Utah`.trim(),
+      });
+      toast.success("Case updated & payment confirmation sent");
+    } else {
+      toast.success("Case updated successfully");
+    }
+
     onUpdate(updated);
-    toast.success("Case updated successfully");
     setSaving(false);
   };
 
