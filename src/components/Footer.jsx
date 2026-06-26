@@ -95,7 +95,7 @@ export default function Footer() {
             </p>
             <ul className="space-y-3 text-sm text-white/50">
               <li>(801) 755-5445</li>
-              <li>utahproservers@yahoo.com</li>
+              <li>contact@utahproservers.com</li>
               <li>4448 Loren Von Dr., Millcreek, UT 84124</li>
               <li className="pt-2 text-white/35">Available 24 Hours a Day, 7 Days a Week</li>
               <li className="text-white/35">Including holidays & after-hours service</li>
