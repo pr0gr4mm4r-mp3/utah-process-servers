@@ -331,14 +331,7 @@ Licensed & Bonded in Utah
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground mb-2 block">County *</label>
-                <Select required value={formData.county} onValueChange={(val) => setFormData({ ...formData, county: val })}>
-                  <SelectTrigger className="bg-background"><SelectValue placeholder="Select county" /></SelectTrigger>
-                  <SelectContent>
-                    {utahCounties.map((c) => (
-                      <SelectItem key={c} value={c}>{c} County</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Input required value={formData.county} onChange={(e) => setFormData({ ...formData, county: e.target.value })} placeholder="e.g. Salt Lake" className="bg-background" />
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground mb-2 block">Respondent / Subject Name *</label>
