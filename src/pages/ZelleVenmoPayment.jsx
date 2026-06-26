@@ -24,7 +24,9 @@ export default function ZelleVenmoPayment() {
 
   const isVenmo = method === "venmo";
   const label = isVenmo ? "Venmo" : "Zelle";
-  const recipient = isVenmo ? config.venmoHandle : config.zelleEmail;
+  const zelleRecipient = config.zelleEmail || "utahproservers@yahoo.com";
+  const venmoRecipient = config.venmoHandle || "";
+  const recipient = isVenmo ? venmoRecipient : zelleRecipient;
 
   const handleProceedToSubmit = () => {
     localStorage.setItem("ups_checkout", JSON.stringify({
@@ -130,9 +132,15 @@ export default function ZelleVenmoPayment() {
                 <p className="text-xs text-muted-foreground mb-1">
                   {isVenmo ? "Venmo Handle" : "Zelle Email / Phone"}
                 </p>
-                <p className="font-bold text-2xl text-foreground font-mono">
-                  {recipient || (isVenmo ? "@UtahProcessServers" : "utahproservers@yahoo.com")}
-                </p>
+                {recipient ? (
+                  <p className="font-bold text-2xl text-foreground font-mono">{recipient}</p>
+                ) : (
+                  <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                    {isVenmo
+                      ? "Venmo handle not configured yet. Please call (801) 755-5445 to arrange payment."
+                      : "Zelle email not configured yet. Please call (801) 755-5445 to arrange payment."}
+                  </p>
+                )}
               </div>
 
               {packagePrice && (
