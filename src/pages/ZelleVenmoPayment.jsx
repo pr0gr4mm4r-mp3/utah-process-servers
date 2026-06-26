@@ -22,7 +22,8 @@ export default function ZelleVenmoPayment() {
     });
   }, []);
 
-  const isVenmo = method === "venmo";
+  const [selectedMethod, setSelectedMethod] = useState(method);
+  const isVenmo = selectedMethod === "venmo";
   const label = isVenmo ? "Venmo" : "Zelle";
   const zelleRecipient = config.zelleEmail || "utahproservers@yahoo.com";
   const venmoRecipient = config.venmoHandle || "";
@@ -30,13 +31,13 @@ export default function ZelleVenmoPayment() {
 
   const handleProceedToSubmit = () => {
     localStorage.setItem("ups_checkout", JSON.stringify({
-      sessionId: `${method}-manual-${Date.now()}`,
+      sessionId: `${selectedMethod}-manual-${Date.now()}`,
       packageName,
       packagePrice,
       serviceType,
-      paymentMethod: method,
+      paymentMethod: selectedMethod,
     }));
-    window.location.href = "/submit?paid=1&method=" + method;
+    window.location.href = "/submit?paid=1&method=" + selectedMethod;
   };
 
   return (
@@ -68,6 +69,32 @@ export default function ZelleVenmoPayment() {
       </div>
 
       <div className="max-w-3xl mx-auto px-6 lg:px-12 py-16 space-y-8">
+
+        {/* Method toggle */}
+        <div className="flex rounded-xl border border-border overflow-hidden">
+          <button
+            onClick={() => setSelectedMethod("zelle")}
+            className={`flex-1 py-4 flex items-center justify-center gap-2.5 text-sm font-semibold transition-colors ${
+              !isVenmo
+                ? "bg-[#6D1ED4] text-white"
+                : "bg-white text-muted-foreground hover:bg-muted/30"
+            }`}
+          >
+            <Smartphone className="w-4 h-4" />
+            Zelle
+          </button>
+          <button
+            onClick={() => setSelectedMethod("venmo")}
+            className={`flex-1 py-4 flex items-center justify-center gap-2.5 text-sm font-semibold transition-colors ${
+              isVenmo
+                ? "bg-[#008CFF] text-white"
+                : "bg-white text-muted-foreground hover:bg-muted/30"
+            }`}
+          >
+            <Smartphone className="w-4 h-4" />
+            Venmo
+          </button>
+        </div>
 
         {/* Important notice */}
         <motion.div
