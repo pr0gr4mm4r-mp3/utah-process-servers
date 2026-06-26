@@ -329,10 +329,7 @@ Licensed & Bonded in Utah
                   </SelectContent>
                 </Select>
               </div>
-              <div>
-                <label className="text-sm font-medium text-foreground mb-2 block">County *</label>
-                <Input required value={formData.county} onChange={(e) => setFormData({ ...formData, county: e.target.value })} placeholder="e.g. Salt Lake" className="bg-background" />
-              </div>
+
               <div>
                 <label className="text-sm font-medium text-foreground mb-2 block">Respondent / Subject Name *</label>
                 <Input required value={formData.respondentName} onChange={(e) => setFormData({ ...formData, respondentName: e.target.value })} placeholder="Full legal name" className="bg-background" />
