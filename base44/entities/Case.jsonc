@@ -98,6 +98,11 @@
       "type": "string",
       "description": "Price paid for the service package"
     },
+    "service_attempts": {
+      "type": "integer",
+      "default": 0,
+      "description": "Number of service attempts made (for Standard Service cases)"
+    },
     "submitted_at": {
       "type": "string",
       "format": "date-time",

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, FileText, Download, Printer, Save, Calendar, Trash2, CreditCard, DollarSign } from "lucide-react";
+import { X, FileText, Download, Printer, Save, Trash2, CreditCard, DollarSign, Target, History } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import CaseHistoryLog from "@/components/admin/CaseHistoryLog";
 
 const STATUS_STYLES = {
   pending: "bg-yellow-50 text-yellow-700",
@@ -30,6 +31,9 @@ const PAYMENT_METHOD_LABELS = {
   other: "Other",
 };
 
+const isStandardCase = (serviceType) =>
+  serviceType?.toLowerCase().includes("standard");
+
 export default function CaseDetailModal({ caseData, onClose, onUpdate }) {
   const [status, setStatus] = useState(caseData.status || "pending");
   const [notes, setNotes] = useState(caseData.notes || "");
@@ -37,8 +41,12 @@ export default function CaseDetailModal({ caseData, onClose, onUpdate }) {
     caseData.delivered_at ? caseData.delivered_at.slice(0, 16) : ""
   );
   const [paymentReceived, setPaymentReceived] = useState(caseData.payment_received || false);
+  const [serviceAttempts, setServiceAttempts] = useState(caseData.service_attempts || 0);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [recordingAttempt, setRecordingAttempt] = useState(false);
+  const [activeTab, setActiveTab] = useState("details");
+  const [logKey, setLogKey] = useState(0); // used to re-render CaseHistoryLog
 
   const handleDelete = async () => {
     if (!window.confirm("Are you sure you want to delete this case? This cannot be undone.")) return;
@@ -51,6 +59,8 @@ export default function CaseDetailModal({ caseData, onClose, onUpdate }) {
   const handleSave = async () => {
     setSaving(true);
     const wasNotPaid = !caseData.payment_received;
+    const prevStatus = caseData.status;
+
     const updated = await base44.entities.Case.update(caseData.id, {
       status,
       notes,
@@ -59,7 +69,17 @@ export default function CaseDetailModal({ caseData, onClose, onUpdate }) {
       delivered_at: deliveredAt ? new Date(deliveredAt).toISOString() : null,
     });
 
-    // Send free email notification when payment is newly marked as received
+    // Log status change if it changed
+    if (status !== prevStatus) {
+      await base44.entities.StatusLog.create({
+        case_id: caseData.id,
+        event_type: "status_change",
+        status,
+      });
+      setLogKey((k) => k + 1);
+    }
+
+    // Send email when payment newly verified
     if (paymentReceived && wasNotPaid && caseData.email) {
       await base44.integrations.Core.SendEmail({
         to: caseData.email,
@@ -73,7 +93,7 @@ Case Details:
 - Service Type: ${caseData.service_type}
 - Respondent: ${caseData.respondent_name}
 
-If you have any questions, please call us at (801) 755-5445 or reply to this email.
+If you have any questions, please call us at (801) 755-5445 or email contact@utahproservers.com.
 
 Utah Process Servers
 Licensed & Bonded in Utah`.trim(),
@@ -85,6 +105,58 @@ Licensed & Bonded in Utah`.trim(),
 
     onUpdate(updated);
     setSaving(false);
+  };
+
+  const handleRecordAttempt = async (attemptNumber) => {
+    if (recordingAttempt) return;
+    setRecordingAttempt(true);
+    try {
+      const updated = await base44.entities.Case.update(caseData.id, {
+        service_attempts: attemptNumber,
+      });
+
+      await base44.entities.StatusLog.create({
+        case_id: caseData.id,
+        event_type: "attempt",
+        attempt_number: attemptNumber,
+      });
+
+      // Email client
+      if (caseData.email) {
+        await base44.integrations.Core.SendEmail({
+          to: caseData.email,
+          subject: `Service Update — Attempt #${attemptNumber} on Your Case`,
+          body: `Dear ${caseData.attorney || "Valued Client"},
+
+This is a courtesy notification from Utah Process Servers.
+
+We have made Service Attempt #${attemptNumber} of 3 to deliver your legal documents to the respondent.
+
+Case Details:
+- Case Number: ${caseData.case_number || "N/A"}
+- Respondent: ${caseData.respondent_name}
+- Respondent Address: ${caseData.respondent_address || "On file"}
+
+${attemptNumber < 3
+  ? `We will make another attempt as part of your Standard Service package.`
+  : `This was our final included attempt. Please contact us to discuss next steps if service was unsuccessful.`}
+
+For questions, call (801) 755-5445 or email contact@utahproservers.com.
+
+Utah Process Servers
+Licensed & Bonded in Utah`.trim(),
+        });
+      }
+
+      setServiceAttempts(attemptNumber);
+      setLogKey((k) => k + 1);
+      onUpdate({ ...caseData, service_attempts: attemptNumber });
+      toast.success(`Attempt #${attemptNumber} recorded — client notified`);
+    } catch {
+      toast.error("Failed to record attempt. Please try again.");
+    } finally {
+      setRecordingAttempt(false);
+    }
   };
 
   const submittedDate = caseData.submitted_at || caseData.created_date;
@@ -122,182 +194,248 @@ Licensed & Bonded in Utah`.trim(),
             </button>
           </div>
 
+          {/* Tabs */}
+          <div className="flex border-b border-border bg-muted/20">
+            {[
+              { key: "details", label: "Details" },
+              { key: "history", label: "History Log", icon: History },
+            ].map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={`flex items-center gap-1.5 px-6 py-3 text-sm font-medium transition-colors border-b-2 ${
+                  activeTab === tab.key
+                    ? "border-primary text-foreground"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {tab.icon && <tab.icon className="w-3.5 h-3.5" />}
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
           <div className="p-6 space-y-6">
-            {/* Client info */}
-            <div>
-              <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold mb-3">Client Information</p>
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                {[
-                  ["Attorney", caseData.attorney],
-                  ["Firm", caseData.firm || "—"],
-                  ["Email", caseData.email],
-                  ["Phone", caseData.phone || "—"],
-                  ["Service Type", caseData.service_type],
-                  ["County", caseData.county ? `${caseData.county} County` : "—"],
-                  ["Respondent", caseData.respondent_name],
-                  ["Address", caseData.respondent_address || "—"],
-                ].map(([label, value]) => (
-                  <div key={label}>
-                    <p className="text-muted-foreground text-xs mb-0.5">{label}</p>
-                    <p className="font-medium text-foreground">{value}</p>
-                  </div>
-                ))}
-              </div>
-              {caseData.special_instructions && (
-                <div className="mt-3">
-                  <p className="text-muted-foreground text-xs mb-0.5">Special Instructions</p>
-                  <p className="text-sm text-foreground bg-muted/40 rounded-lg p-3">{caseData.special_instructions}</p>
-                </div>
-              )}
-            </div>
-
-            {/* Dates */}
-            <div>
-              <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold mb-3">Dates</p>
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div>
-                  <p className="text-muted-foreground text-xs mb-0.5">Submitted</p>
-                  <p className="font-medium">
-                    {submittedDate ? format(new Date(submittedDate), "MMM d, yyyy — h:mm a") : "—"}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground text-xs mb-1">Delivered At</p>
-                  <input
-                    type="datetime-local"
-                    value={deliveredAt}
-                    onChange={(e) => setDeliveredAt(e.target.value)}
-                    className="text-sm border border-border rounded-lg px-3 py-1.5 w-full bg-background"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Documents */}
-            {caseData.document_urls?.length > 0 && (
+            {activeTab === "history" ? (
               <div>
-                <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold mb-3">
-                  Documents ({caseData.document_urls.length})
-                </p>
-                <div className="space-y-2">
-                  {caseData.document_urls.map((doc, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center justify-between bg-muted/30 border border-border rounded-lg px-4 py-2.5"
-                    >
-                      <div className="flex items-center gap-2 min-w-0">
-                        <FileText className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-sm font-medium text-foreground truncate">{doc.name}</span>
+                <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold mb-4">Status & Attempt History</p>
+                <CaseHistoryLog key={logKey} caseId={caseData.id} />
+              </div>
+            ) : (
+              <>
+                {/* Client info */}
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold mb-3">Client Information</p>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    {[
+                      ["Attorney", caseData.attorney],
+                      ["Firm", caseData.firm || "—"],
+                      ["Email", caseData.email],
+                      ["Phone", caseData.phone || "—"],
+                      ["Service Type", caseData.service_type],
+                      ["County", caseData.county ? `${caseData.county} County` : "—"],
+                      ["Respondent", caseData.respondent_name],
+                      ["Address", caseData.respondent_address || "—"],
+                    ].map(([label, value]) => (
+                      <div key={label}>
+                        <p className="text-muted-foreground text-xs mb-0.5">{label}</p>
+                        <p className="font-medium text-foreground">{value}</p>
                       </div>
-                      <div className="flex items-center gap-1 ml-3 flex-shrink-0">
-                        <a
-                          href={doc.url}
-                          download={doc.name}
-                          title="Download"
-                          className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                        >
-                          <Download className="w-4 h-4" />
-                        </a>
-                        <button
-                          title="Print"
-                          onClick={() => {
-                            const win = window.open(doc.url, "_blank");
-                            win.onload = () => win.print();
-                          }}
-                          className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                        >
-                          <Printer className="w-4 h-4" />
-                        </button>
+                    ))}
+                  </div>
+                  {caseData.special_instructions && (
+                    <div className="mt-3">
+                      <p className="text-muted-foreground text-xs mb-0.5">Special Instructions</p>
+                      <p className="text-sm text-foreground bg-muted/40 rounded-lg p-3">{caseData.special_instructions}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Service Attempts — Standard cases only */}
+                {isStandardCase(caseData.service_type) && (
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold mb-3">
+                      Service Attempts
+                    </p>
+                    <div className="bg-muted/30 border border-border rounded-xl p-4">
+                      <p className="text-xs text-muted-foreground mb-3">
+                        Standard Service includes up to 3 attempts. Client receives an email notification for each attempt recorded.
+                      </p>
+                      <div className="flex items-center gap-3">
+                        {[1, 2, 3].map((n) => (
+                          <button
+                            key={n}
+                            onClick={() => serviceAttempts < n && handleRecordAttempt(n)}
+                            disabled={recordingAttempt || serviceAttempts >= n}
+                            className={`flex flex-col items-center justify-center w-16 h-16 rounded-xl border-2 text-sm font-bold transition-all ${
+                              serviceAttempts >= n
+                                ? "border-primary bg-primary/10 text-primary"
+                                : "border-border text-muted-foreground hover:border-primary/50 hover:text-primary"
+                            } disabled:opacity-50 disabled:cursor-not-allowed`}
+                          >
+                            <Target className={`w-4 h-4 mb-1 ${serviceAttempts >= n ? "text-primary" : "text-muted-foreground"}`} />
+                            #{n}
+                          </button>
+                        ))}
+                        <div className="ml-2 text-sm text-muted-foreground">
+                          {serviceAttempts === 0 && "No attempts recorded"}
+                          {serviceAttempts === 1 && "1 of 3 attempts made"}
+                          {serviceAttempts === 2 && "2 of 3 attempts made"}
+                          {serviceAttempts === 3 && "All 3 attempts completed"}
+                        </div>
                       </div>
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
+                  </div>
+                )}
 
-            {/* Payment info */}
-            <div>
-              <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold mb-3">Payment</p>
-              <div className="grid grid-cols-2 gap-3 text-sm mb-4">
+                {/* Dates */}
                 <div>
-                  <p className="text-muted-foreground text-xs mb-0.5">Method</p>
-                  <div className="flex items-center gap-1.5 font-medium text-foreground">
-                    <CreditCard className="w-3.5 h-3.5 text-muted-foreground" />
-                    {PAYMENT_METHOD_LABELS[caseData.payment_method] || "—"}
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold mb-3">Dates</p>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <p className="text-muted-foreground text-xs mb-0.5">Submitted</p>
+                      <p className="font-medium">
+                        {submittedDate ? format(new Date(submittedDate), "MMM d, yyyy — h:mm a") : "—"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground text-xs mb-1">Delivered At</p>
+                      <input
+                        type="datetime-local"
+                        value={deliveredAt}
+                        onChange={(e) => setDeliveredAt(e.target.value)}
+                        className="text-sm border border-border rounded-lg px-3 py-1.5 w-full bg-background"
+                      />
+                    </div>
                   </div>
                 </div>
+
+                {/* Documents */}
+                {caseData.document_urls?.length > 0 && (
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold mb-3">
+                      Documents ({caseData.document_urls.length})
+                    </p>
+                    <div className="space-y-2">
+                      {caseData.document_urls.map((doc, i) => (
+                        <div
+                          key={i}
+                          className="flex items-center justify-between bg-muted/30 border border-border rounded-lg px-4 py-2.5"
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <FileText className="w-4 h-4 text-primary flex-shrink-0" />
+                            <span className="text-sm font-medium text-foreground truncate">{doc.name}</span>
+                          </div>
+                          <div className="flex items-center gap-1 ml-3 flex-shrink-0">
+                            <a
+                              href={doc.url}
+                              download={doc.name}
+                              title="Download"
+                              className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                            >
+                              <Download className="w-4 h-4" />
+                            </a>
+                            <button
+                              title="Print"
+                              onClick={() => {
+                                const win = window.open(doc.url, "_blank");
+                                win.onload = () => win.print();
+                              }}
+                              className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                            >
+                              <Printer className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Payment info */}
                 <div>
-                  <p className="text-muted-foreground text-xs mb-0.5">Amount</p>
-                  <p className="font-medium text-foreground">
-                    {caseData.package_price ? `$${parseFloat(caseData.package_price).toFixed(2)}` : "—"}
-                    {caseData.package_name ? <span className="text-muted-foreground text-xs ml-1">({caseData.package_name})</span> : null}
-                  </p>
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold mb-3">Payment</p>
+                  <div className="grid grid-cols-2 gap-3 text-sm mb-4">
+                    <div>
+                      <p className="text-muted-foreground text-xs mb-0.5">Method</p>
+                      <div className="flex items-center gap-1.5 font-medium text-foreground">
+                        <CreditCard className="w-3.5 h-3.5 text-muted-foreground" />
+                        {PAYMENT_METHOD_LABELS[caseData.payment_method] || "—"}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground text-xs mb-0.5">Amount</p>
+                      <p className="font-medium text-foreground">
+                        {caseData.package_price ? `$${parseFloat(caseData.package_price).toFixed(2)}` : "—"}
+                        {caseData.package_name ? <span className="text-muted-foreground text-xs ml-1">({caseData.package_name})</span> : null}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between bg-muted/30 border border-border rounded-xl px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-sm font-medium text-foreground">Payment Received</span>
+                      {paymentReceived ? (
+                        <span className="text-xs bg-green-100 text-green-700 border border-green-200 px-2 py-0.5 rounded-full font-medium">Verified</span>
+                      ) : (
+                        <span className="text-xs bg-yellow-50 text-yellow-700 border border-yellow-200 px-2 py-0.5 rounded-full font-medium">Pending</span>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setPaymentReceived(!paymentReceived)}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+                        paymentReceived ? "bg-green-500" : "bg-gray-200"
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                          paymentReceived ? "translate-x-6" : "translate-x-1"
+                        }`}
+                      />
+                    </button>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center justify-between bg-muted/30 border border-border rounded-xl px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <DollarSign className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-sm font-medium text-foreground">Payment Received</span>
-                  {paymentReceived && (
-                    <span className="text-xs bg-green-100 text-green-700 border border-green-200 px-2 py-0.5 rounded-full font-medium">Verified</span>
-                  )}
-                  {!paymentReceived && (
-                    <span className="text-xs bg-yellow-50 text-yellow-700 border border-yellow-200 px-2 py-0.5 rounded-full font-medium">Pending</span>
-                  )}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setPaymentReceived(!paymentReceived)}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
-                    paymentReceived ? "bg-green-500" : "bg-gray-200"
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
-                      paymentReceived ? "translate-x-6" : "translate-x-1"
-                    }`}
+
+                {/* Status + notes */}
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold mb-3">Update Status</p>
+                  <Select value={status} onValueChange={setStatus}>
+                    <SelectTrigger className="mb-4">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pending">Pending</SelectItem>
+                      <SelectItem value="in_progress">In Progress</SelectItem>
+                      <SelectItem value="delivered">Delivered</SelectItem>
+                      <SelectItem value="failed">Failed</SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold mb-2">Internal Notes</p>
+                  <Textarea
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder="Add notes, attempt history, affidavit details..."
+                    className="min-h-[100px]"
                   />
-                </button>
-              </div>
-            </div>
+                </div>
 
-            {/* Status + notes */}
-            <div>
-              <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold mb-3">Update Status</p>
-              <Select value={status} onValueChange={setStatus}>
-                <SelectTrigger className="mb-4">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="in_progress">In Progress</SelectItem>
-                  <SelectItem value="delivered">Delivered</SelectItem>
-                  <SelectItem value="failed">Failed</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold mb-2">Internal Notes</p>
-              <Textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Add notes, attempt history, affidavit details..."
-                className="min-h-[100px]"
-              />
-            </div>
-
-            <div className="flex justify-between items-center pt-2">
-              <Button variant="destructive" onClick={handleDelete} disabled={deleting} className="gap-2">
-                {deleting ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                Delete Case
-              </Button>
-              <div className="flex gap-3">
-                <Button variant="outline" onClick={onClose}>Cancel</Button>
-                <Button onClick={handleSave} disabled={saving} className="bg-primary gap-2">
-                  {saving ? <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" /> : <Save className="w-4 h-4" />}
-                  Save Changes
-                </Button>
-              </div>
-            </div>
+                <div className="flex justify-between items-center pt-2">
+                  <Button variant="destructive" onClick={handleDelete} disabled={deleting} className="gap-2">
+                    {deleting ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                    Delete Case
+                  </Button>
+                  <div className="flex gap-3">
+                    <Button variant="outline" onClick={onClose}>Cancel</Button>
+                    <Button onClick={handleSave} disabled={saving} className="bg-primary gap-2">
+                      {saving ? <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" /> : <Save className="w-4 h-4" />}
+                      Save Changes
+                    </Button>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </motion.div>
       </div>

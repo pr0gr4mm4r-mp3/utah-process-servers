@@ -1,0 +1,34 @@
+{
+  "name": "StatusLog",
+  "type": "object",
+  "properties": {
+    "case_id": {
+      "type": "string",
+      "description": "ID of the related Case"
+    },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "status_change",
+        "attempt"
+      ],
+      "description": "Type of log event"
+    },
+    "status": {
+      "type": "string",
+      "description": "Status value at time of log (for status_change events)"
+    },
+    "attempt_number": {
+      "type": "integer",
+      "description": "Attempt number (for attempt events)"
+    },
+    "note": {
+      "type": "string",
+      "description": "Optional note for this log entry"
+    }
+  },
+  "required": [
+    "case_id",
+    "event_type"
+  ]
+}
