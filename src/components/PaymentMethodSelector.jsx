@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
-import { CreditCard, Smartphone, Loader2, X } from "lucide-react";
+import { Smartphone, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -15,7 +15,6 @@ const PayPalIcon = () => (
 export default function PaymentMethodSelector({ pkg, onClose }) {
   const [config, setConfig] = useState(null);
   const [loadingConfig, setLoadingConfig] = useState(true);
-  const [loadingStripe, setLoadingStripe] = useState(false);
   const [loadingPaypal, setLoadingPaypal] = useState(false);
   const [paypalReady, setPaypalReady] = useState(false);
 
@@ -76,29 +75,6 @@ export default function PaymentMethodSelector({ pkg, onClose }) {
     }).render("#paypal-button-container");
   }, [paypalReady, pkg]);
 
-  const handleStripe = async () => {
-    setLoadingStripe(true);
-    try {
-      const response = await base44.functions.invoke("stripeCheckout", {
-        packageName: pkg.name,
-        packagePrice: pkg.price,
-        serviceType: pkg.serviceType,
-      });
-      const { url, sessionId } = response.data;
-      localStorage.setItem("ups_checkout", JSON.stringify({
-        sessionId,
-        packageName: pkg.name,
-        packagePrice: pkg.price,
-        serviceType: pkg.serviceType,
-        paymentMethod: "stripe",
-      }));
-      window.location.href = url;
-    } catch (err) {
-      toast.error("Unable to start card checkout. Please try again.");
-      setLoadingStripe(false);
-    }
-  };
-
   const handleManual = (method) => {
     const params = new URLSearchParams({
       method,
@@ -141,21 +117,6 @@ export default function PaymentMethodSelector({ pkg, onClose }) {
             </div>
           ) : (
             <div className="space-y-3">
-              {/* Stripe */}
-              <Button
-                onClick={handleStripe}
-                disabled={loadingStripe}
-                className="w-full py-6 bg-[#635BFF] hover:bg-[#5851e6] text-white font-semibold justify-start gap-3"
-              >
-                {loadingStripe ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <CreditCard className="w-5 h-5" />
-                )}
-                Pay with Credit / Debit Card
-                <span className="ml-auto text-xs opacity-70">via Stripe</span>
-              </Button>
-
               {/* PayPal */}
               {config?.paypalClientId && (
                 <div className="border border-border rounded-xl overflow-hidden">
