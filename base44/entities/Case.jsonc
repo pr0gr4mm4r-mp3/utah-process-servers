@@ -38,6 +38,14 @@
       "type": "string",
       "description": "Known address of respondent"
     },
+    "respondent_employer": {
+      "type": "string",
+      "description": "Respondent employer or company name"
+    },
+    "respondent_employer_address": {
+      "type": "string",
+      "description": "Respondent work/employer address"
+    },
     "special_instructions": {
       "type": "string",
       "description": "Any special instructions for service"

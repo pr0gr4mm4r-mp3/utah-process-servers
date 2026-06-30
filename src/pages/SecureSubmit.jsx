@@ -35,6 +35,8 @@ export default function SecureSubmit() {
     county: "",
     respondentName: "",
     respondentAddress: "",
+    respondentEmployer: "",
+    respondentEmployerAddress: "",
     specialInstructions: "",
   });
 
@@ -111,6 +113,8 @@ export default function SecureSubmit() {
         county: formData.county,
         respondent_name: formData.respondentName,
         respondent_address: formData.respondentAddress,
+        respondent_employer: formData.respondentEmployer,
+        respondent_employer_address: formData.respondentEmployerAddress,
         special_instructions: formData.specialInstructions,
         document_urls: uploadedUrls,
         checkout_id: checkoutInfo?.sessionId || "",
@@ -338,6 +342,20 @@ Licensed & Bonded in Utah
                 <label className="text-sm font-medium text-foreground mb-2 block">Known Address</label>
                 <Input value={formData.respondentAddress} onChange={(e) => setFormData({ ...formData, respondentAddress: e.target.value })} placeholder="Street, City, State, ZIP" className="bg-background" />
               </div>
+              <div className="sm:col-span-2 border-t border-border pt-6 mt-2">
+                <p className="text-xs tracking-[0.15em] uppercase text-muted-foreground font-semibold mb-4">Respondent Employment Information <span className="normal-case font-normal">(optional)</span></p>
+                <div className="grid sm:grid-cols-2 gap-6">
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-2 block">Company / Employer Name</label>
+                    <Input value={formData.respondentEmployer} onChange={(e) => setFormData({ ...formData, respondentEmployer: e.target.value })} placeholder="Employer or company name" className="bg-background" />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-foreground mb-2 block">Work Address</label>
+                    <Input value={formData.respondentEmployerAddress} onChange={(e) => setFormData({ ...formData, respondentEmployerAddress: e.target.value })} placeholder="Street, City, State, ZIP" className="bg-background" />
+                  </div>
+                </div>
+              </div>
+
               <div className="sm:col-span-2">
                 <label className="text-sm font-medium text-foreground mb-2 block">Special Instructions</label>
                 <Textarea value={formData.specialInstructions} onChange={(e) => setFormData({ ...formData, specialInstructions: e.target.value })} placeholder="Gated community, specific times to avoid, multiple attempts preferred, etc." className="bg-background min-h-[100px]" />
