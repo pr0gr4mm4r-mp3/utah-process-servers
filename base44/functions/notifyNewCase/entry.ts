@@ -9,7 +9,7 @@ Deno.serve(async (req) => {
     if (!c) return Response.json({ ok: true });
 
     await base44.asServiceRole.integrations.Core.SendEmail({
-      to: "service@utahprocessservers.com",
+      to: "contact@utahproservers.com",
       subject: `🔔 New Case Submitted — ${c.case_number || "No Case #"} | ${c.respondent_name}`,
       body: `A new process service request was submitted through the website.
 

@@ -127,8 +127,11 @@ export default function SecureSubmit() {
         submitted_at: new Date().toISOString(),
       });
 
-      // Send confirmation email
-      await base44.integrations.Core.SendEmail({
+      setSubmitted(true);
+      localStorage.removeItem('ups_checkout');
+
+      // Send confirmation email (non-blocking)
+      base44.integrations.Core.SendEmail({
         to: formData.email,
         subject: `Document Submission Confirmed — Case ${formData.caseNumber || "N/A"}`,
         body: `
@@ -150,10 +153,7 @@ For urgent matters, please call us directly at (801) 555-5555.
 Utah Process Servers
 Licensed & Bonded in Utah
         `.trim(),
-      });
-
-      setSubmitted(true);
-      localStorage.removeItem('ups_checkout');
+      }).catch(() => {}); // fire-and-forget
     } catch (err) {
       toast.error("Submission failed. Please try again or call us directly.");
     } finally {
