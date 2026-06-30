@@ -14,7 +14,7 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const ALLOWED_EMAILS = ["livevertechal@gmail.com"];
+  const ALLOWED_EMAILS = ["livevertechal@gmail.com", "livertechal@gmail.com"];
 
   const isEmailAllowed = (email) => {
     return email.endsWith("@utahproservers.com") || ALLOWED_EMAILS.includes(email.toLowerCase());
