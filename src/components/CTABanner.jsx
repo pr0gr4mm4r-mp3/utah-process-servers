@@ -2,6 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function CTABanner() {
   return (
@@ -32,12 +33,12 @@ export default function CTABanner() {
               us for reliable, court-compliant process service.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10">
-              <a href="#contact">
+              <Link to="/pricing">
                 <Button className="bg-[#C4A265] text-[#1A1C1E] hover:bg-[#C4A265]/90 font-semibold text-base px-8 py-6 tracking-wide">
                   Request Service Now
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
-              </a>
+              </Link>
               <a href="tel:+18015555555">
                 <Button
                   variant="outline"
