@@ -87,11 +87,21 @@ export default function AdminDashboard() {
     }
 
     if (activeTab === "submitted") {
-      list.sort(
-        (a, b) =>
+      const priority = (c) => {
+        if (c.status === "in_progress") return 0;
+        if (c.status === "pending" && !c.payment_received) return 1;
+        if (c.status === "pending" && c.payment_received) return 2;
+        if (c.status === "delivered") return 4;
+        return 3; // failed / other
+      };
+      list.sort((a, b) => {
+        const diff = priority(a) - priority(b);
+        if (diff !== 0) return diff;
+        return (
           new Date(b.submitted_at || b.created_date) -
           new Date(a.submitted_at || a.created_date)
-      );
+        );
+      });
     } else if (activeTab === "delivered") {
       list = list.filter((c) => c.delivered_at);
       list.sort((a, b) => new Date(b.delivered_at) - new Date(a.delivered_at));
