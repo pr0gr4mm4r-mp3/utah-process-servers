@@ -93,7 +93,7 @@ Case Details:
 - Service Type: ${caseData.service_type}
 - Respondent: ${caseData.respondent_name}
 
-If you have any questions, please call us at (801) 755-5445 or email contact@utahproservers.com.
+If you have any questions, please call us at (801) 755-5445 or email utahproservers@yahoo.com.
 
 Utah Process Servers
 Licensed & Bonded in Utah`.trim(),
@@ -141,7 +141,7 @@ ${attemptNumber < 3
   ? `We will make another attempt as part of your Standard Service package.`
   : `This was our final included attempt. Please contact us to discuss next steps if service was unsuccessful.`}
 
-For questions, call (801) 755-5445 or email contact@utahproservers.com.
+For questions, call (801) 755-5445 or email utahproservers@yahoo.com.
 
 Utah Process Servers
 Licensed & Bonded in Utah`.trim(),
