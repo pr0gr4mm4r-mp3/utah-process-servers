@@ -43,7 +43,7 @@ export default function HeroSection() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 mt-10">
-              <Link to="/submit">
+              <Link to="/pricing">
                 <Button className="bg-[#C4A265] text-[#1A1C1E] hover:bg-[#C4A265]/90 font-semibold text-base px-8 py-6 tracking-wide">
                   Request Service
                   <ArrowRight className="w-4 h-4 ml-2" />
@@ -105,7 +105,7 @@ export default function HeroSection() {
                 ))}
               </div>
 
-              <Link to="/submit" className="block mt-6">
+              <Link to="/pricing" className="block mt-6">
                 <Button className="w-full bg-white text-[#1A1C1E] hover:bg-white/90 font-semibold py-5">
                   Start Your Service Request
                   <ArrowRight className="w-4 h-4 ml-2" />

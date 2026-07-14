@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { Check, Clock } from "lucide-react";
 import { motion } from "framer-motion";
-import PaymentMethodSelector from "@/components/PaymentMethodSelector";
 
 const PACKAGES = [
   {
@@ -78,18 +77,19 @@ const PACKAGES = [
 const FEATURED_IDS = ["standard", "rush", "same_day"];
 
 export default function PackageSelection() {
-  const [selectedPkg, setSelectedPkg] = useState(null);
-
   const featured = PACKAGES.filter(p => FEATURED_IDS.includes(p.id));
   const additional = PACKAGES.filter(p => !FEATURED_IDS.includes(p.id));
 
   const handleSelect = (pkg) => {
-    // Documents must be submitted before payment (submission-before-payment flow)
-    if (!localStorage.getItem("ups_submission")) {
-      window.location.href = "/submit";
-      return;
-    }
-    setSelectedPkg(pkg);
+    // Pricing-first flow: save the selected package, then submit documents
+    localStorage.setItem("ups_package", JSON.stringify({
+      id: pkg.id,
+      name: pkg.name,
+      price: pkg.price,
+      serviceType: pkg.serviceType,
+      turnaround: pkg.turnaround,
+    }));
+    window.location.href = "/submit";
   };
 
   return (
@@ -146,7 +146,7 @@ export default function PackageSelection() {
                 className={`w-full py-5 font-semibold ${pkg.popular ? "bg-primary text-primary-foreground" : ""}`}
                 variant={pkg.popular ? "default" : "outline"}
               >
-                Select & Pay
+                Continue
               </Button>
             </motion.div>
           ))}
@@ -187,9 +187,6 @@ export default function PackageSelection() {
         </div>
       </div>
 
-      {selectedPkg && (
-        <PaymentMethodSelector pkg={selectedPkg} onClose={() => setSelectedPkg(null)} />
-      )}
     </div>
   );
 }

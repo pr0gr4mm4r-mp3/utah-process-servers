@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,11 +10,15 @@ import { toast } from "sonner";
 import { base44 } from "@/api/base44Client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import PaymentMethodSelector from "@/components/PaymentMethodSelector";
 
 export default function SecureSubmit() {
   const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [pkg, setPkg] = useState(null);
+  const [showPayment, setShowPayment] = useState(false);
+  const [saved, setSaved] = useState(false);
   const [formData, setFormData] = useState({
     caseNumber: "",
     attorney: "",
@@ -28,6 +32,19 @@ export default function SecureSubmit() {
     respondentEmployerAddress: "",
     specialInstructions: "",
   });
+
+  useEffect(() => {
+    const raw = localStorage.getItem("ups_package");
+    if (!raw) {
+      window.location.href = "/pricing";
+      return;
+    }
+    try {
+      setPkg(JSON.parse(raw));
+    } catch {
+      window.location.href = "/pricing";
+    }
+  }, []);
 
   const utahCounties = [
     "Beaver", "Box Elder", "Cache", "Carbon", "Daggett", "Davis", "Duchesne",
@@ -77,7 +94,9 @@ export default function SecureSubmit() {
         submitted_at: new Date().toISOString(),
       }));
 
-      window.location.href = "/pricing";
+      setSaved(true);
+      setShowPayment(true);
+      setSubmitting(false);
     } catch (err) {
       toast.error("Submission failed. Please try again or call us directly.");
       setSubmitting(false);
@@ -102,15 +121,20 @@ export default function SecureSubmit() {
             </div>
             <div>
               <p className="text-xs tracking-[0.2em] uppercase text-[#C4A265] font-semibold mb-3">
-                Step 1 of 2 — Encrypted Document Portal
+                Step 2 of 2 — Encrypted Document Portal
               </p>
               <h1 className="font-heading text-3xl md:text-4xl font-bold text-white leading-tight">
                 Secure Document Submission
               </h1>
+              {pkg && (
+                <p className="mt-3 text-sm text-[#C4A265] font-medium">
+                  Selected package: {pkg.name} — ${parseFloat(pkg.price).toFixed(2)}
+                </p>
+              )}
               <p className="mt-4 text-white/50 text-base leading-relaxed max-w-xl">
                 Submit your legal documents and case details for process service assignment.
-                All uploads are encrypted in transit and at rest. After submission, you'll select
-                your service package and complete payment.
+                All uploads are encrypted in transit and at rest. After submission, you'll complete
+                payment for your selected service package.
               </p>
             </div>
           </div>
@@ -281,29 +305,45 @@ export default function SecureSubmit() {
             className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pt-4"
           >
             <p className="text-xs text-muted-foreground max-w-sm leading-relaxed">
-              By continuing, you confirm all information is accurate. You'll select your service package
-              and complete payment on the next step.
+              By continuing, you confirm all information is accurate. You'll complete payment on the next step.
             </p>
-            <Button
-              type="submit"
-              disabled={submitting}
-              className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold px-10 py-6 text-base tracking-wide flex-shrink-0"
-            >
-              {submitting ? (
+            {saved ? (
+              <Button
+                type="button"
+                onClick={() => setShowPayment(true)}
+                className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold px-10 py-6 text-base tracking-wide flex-shrink-0"
+              >
                 <span className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                  {uploading ? "Uploading Files..." : "Saving..."}
-                </span>
-              ) : (
-                <span className="flex items-center gap-2">
-                  Continue to Payment
+                  Complete Payment
                   <ArrowRight className="w-4 h-4" />
                 </span>
-              )}
-            </Button>
+              </Button>
+            ) : (
+              <Button
+                type="submit"
+                disabled={submitting}
+                className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold px-10 py-6 text-base tracking-wide flex-shrink-0"
+              >
+                {submitting ? (
+                  <span className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                    {uploading ? "Uploading Files..." : "Saving..."}
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2">
+                    Continue to Payment
+                    <ArrowRight className="w-4 h-4" />
+                  </span>
+                )}
+              </Button>
+            )}
           </motion.div>
         </form>
       </div>
+
+      {showPayment && pkg && (
+        <PaymentMethodSelector pkg={pkg} onClose={() => setShowPayment(false)} />
+      )}
 
       <Footer />
     </div>

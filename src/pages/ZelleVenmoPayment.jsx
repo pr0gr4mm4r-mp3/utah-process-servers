@@ -46,8 +46,8 @@ export default function ZelleVenmoPayment() {
 
       <div className="bg-[#1A1C1E] pt-32 pb-20">
         <div className="max-w-3xl mx-auto px-6 lg:px-12">
-          <Link to="/pricing" className="inline-flex items-center gap-2 text-white/40 hover:text-white/70 text-sm transition-colors mb-8">
-            ← Back to Pricing
+          <Link to="/submit" className="inline-flex items-center gap-2 text-white/40 hover:text-white/70 text-sm transition-colors mb-8">
+            ← Back to Documents
           </Link>
           <div className="flex items-start gap-5">
             <div className="w-12 h-12 rounded-xl bg-[#C4A265]/15 border border-[#C4A265]/20 flex items-center justify-center flex-shrink-0 mt-1">
@@ -214,8 +214,8 @@ export default function ZelleVenmoPayment() {
           transition={{ delay: 0.2 }}
           className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-border"
         >
-          <Link to="/pricing" className="flex-1">
-            <Button variant="outline" className="w-full">← Back to Pricing</Button>
+          <Link to="/submit" className="flex-1">
+            <Button variant="outline" className="w-full">← Back to Documents</Button>
           </Link>
           <Button
             onClick={handleProceedToSubmit}
