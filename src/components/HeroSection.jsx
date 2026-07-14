@@ -17,7 +17,7 @@ export default function HeroSection() {
         <div className="absolute inset-0 bg-gradient-to-r from-[#1A1C1E]/90 via-[#1A1C1E]/70 to-[#1A1C1E]/40" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 w-full pt-32 pb-48 lg:pt-0 lg:pb-0">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 w-full pt-32 pb-48 lg:pt-12 lg:pb-24">
         <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
           {/* Left — headline */}
           <motion.div
