@@ -20,6 +20,7 @@ export default function Navbar() {
     { label: "Process", href: "#process" },
     { label: "Coverage", href: "#coverage" },
     { label: "Contact", href: "#contact" },
+    { label: "Case Lookup", href: "/case-lookup", isRoute: true },
 
   ];
 
@@ -56,6 +57,14 @@ export default function Navbar() {
                     <Lock className="w-3.5 h-3.5" />
                     {link.label}
                   </Link>
+                ) : link.isRoute ? (
+                  <Link
+                    key={link.label}
+                    to={link.href}
+                    className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors tracking-wide uppercase"
+                  >
+                    {link.label}
+                  </Link>
                 ) : (
                   <a
                     key={link.label}
@@ -69,9 +78,6 @@ export default function Navbar() {
             </div>
 
             <div className="hidden lg:flex items-center gap-4">
-              <Link to="/case-lookup" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors tracking-wide uppercase">
-                Case Lookup
-              </Link>
               <Link to="/pricing">
                 <Button className="bg-primary text-primary-foreground hover:bg-primary/90 font-medium tracking-wide text-sm px-6">
                   Get Started
@@ -117,6 +123,15 @@ export default function Navbar() {
                     <Lock className="w-6 h-6" />
                     {link.label}
                   </Link>
+                ) : link.isRoute ? (
+                  <Link
+                    key={link.label}
+                    to={link.href}
+                    onClick={() => setMobileOpen(false)}
+                    className="font-heading text-3xl font-medium text-foreground hover:text-primary transition-colors"
+                  >
+                    {link.label}
+                  </Link>
                 ) : (
                   <a
                     key={link.label}
@@ -128,9 +143,6 @@ export default function Navbar() {
                   </a>
                 )
               )}
-              <Link to="/case-lookup" onClick={() => setMobileOpen(false)} className="font-heading text-3xl font-medium text-foreground hover:text-primary transition-colors">
-                Case Lookup
-              </Link>
               <Link to="/pricing" onClick={() => setMobileOpen(false)} className="w-full mt-4">
                 <Button className="w-full bg-primary text-primary-foreground text-lg py-6">
                   Get Started
