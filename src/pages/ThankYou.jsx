@@ -73,28 +73,13 @@ export default function ThankYou() {
         });
 
         // Client confirmation email (sent server-side so external emails are delivered)
-        base44.functions.invoke("sendClientEmail", {
+        base44.functions.invoke("sendConfirmationEmail", {
           to: fd.email,
-          subject: `Submission Confirmed — Case ${fd.caseNumber || "N/A"}`,
-          body: `Dear ${fd.attorney || "Valued Client"},
-
-Your secure document submission has been received by Utah Process Servers and your payment has been ${isInstant ? "processed" : "noted for verification"}.
-
-Submission Details:
-- Case Number: ${fd.caseNumber || "Not provided"}
-- Service Type: ${checkout.serviceType || checkout.packageName}
-- County: ${fd.county} County
-- Respondent: ${fd.respondentName}
-- Files Submitted: ${(submission.document_urls || []).map((f) => f.name).join(", ") || "None"}
-
-${isInstant
-  ? "A member of our team will review your submission and contact you within one business hour to confirm service assignment."
-  : "Your Zelle/Venmo payment is being verified by our team. Once confirmed, your case will be activated and a coordinator will contact you within one business hour."}
-
-For urgent matters, please call us directly at (801) 755-5445.
-
-Utah Process Servers
-Licensed & Bonded in Utah`.trim(),
+          attorney: fd.attorney,
+          caseNumber: fd.caseNumber,
+          isInstant,
+          checkout,
+          submission,
         }).catch(() => {});
 
         if (cancelled) return;
