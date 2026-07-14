@@ -53,7 +53,7 @@ export default function ServicesSection() {
             Salt Lake Valley Process Serving & Legal Document Services
           </h2>
           <p className="mt-6 text-muted-foreground text-lg leading-relaxed">
-            From routine civil process to complex skip traces, we handle every aspect of legal document delivery across Salt Lake City, Millcreek, Sandy, West Valley, and all of Salt Lake County.
+            From routine civil process to complex corporate service, we handle every aspect of legal document delivery across Salt Lake City, Millcreek, Sandy, West Valley, and all of Salt Lake County.
           </p>
         </motion.div>
 
