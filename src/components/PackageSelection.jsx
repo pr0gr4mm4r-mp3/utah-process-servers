@@ -83,6 +83,15 @@ export default function PackageSelection() {
   const featured = PACKAGES.filter(p => FEATURED_IDS.includes(p.id));
   const additional = PACKAGES.filter(p => !FEATURED_IDS.includes(p.id));
 
+  const handleSelect = (pkg) => {
+    // Documents must be submitted before payment (submission-before-payment flow)
+    if (!localStorage.getItem("ups_submission")) {
+      window.location.href = "/submit";
+      return;
+    }
+    setSelectedPkg(pkg);
+  };
+
   return (
     <div className="py-20">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
@@ -133,7 +142,7 @@ export default function PackageSelection() {
                 ))}
               </ul>
               <Button
-                onClick={() => setSelectedPkg(pkg)}
+                onClick={() => handleSelect(pkg)}
                 className={`w-full py-5 font-semibold ${pkg.popular ? "bg-primary text-primary-foreground" : ""}`}
                 variant={pkg.popular ? "default" : "outline"}
               >
@@ -167,7 +176,7 @@ export default function PackageSelection() {
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => setSelectedPkg(pkg)}
+                    onClick={() => handleSelect(pkg)}
                   >
                     Select
                   </Button>

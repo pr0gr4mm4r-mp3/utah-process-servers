@@ -37,7 +37,7 @@ export default function ZelleVenmoPayment() {
       serviceType,
       paymentMethod: selectedMethod,
     }));
-    window.location.href = "/submit?paid=1&method=" + selectedMethod;
+    window.location.href = "/thank-you";
   };
 
   return (
@@ -182,7 +182,7 @@ export default function ZelleVenmoPayment() {
                 <p>1. Open your {label} app and search for the {isVenmo ? "handle" : "email/phone"} above.</p>
                 <p>2. Send exactly <strong className="text-foreground">${packagePrice ? parseFloat(packagePrice).toFixed(2) : "the amount shown"}</strong>.</p>
                 <p>3. In the note/memo, include your name and "Process Service".</p>
-                <p>4. Click below to submit your case documents — our team will verify payment and begin service.</p>
+                <p>4. Click below once you've sent payment — our team will verify it and begin service.</p>
               </div>
             </div>
           </div>
@@ -221,7 +221,7 @@ export default function ZelleVenmoPayment() {
             onClick={handleProceedToSubmit}
             className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold py-5"
           >
-            I've Sent Payment — Submit Documents
+            I've Sent Payment — Complete Submission
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         </motion.div>

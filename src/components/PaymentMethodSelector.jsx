@@ -65,7 +65,7 @@ export default function PaymentMethodSelector({ pkg, onClose }) {
             serviceType: pkg.serviceType,
             paymentMethod: "paypal",
           }));
-          window.location.href = "/submit?paid=1&method=paypal";
+          window.location.href = "/thank-you";
         });
       },
       onError: (err) => {

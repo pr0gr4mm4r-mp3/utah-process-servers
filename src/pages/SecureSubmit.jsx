@@ -3,14 +3,8 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Shield, Lock, Upload, FileText, CheckCircle, X, ArrowLeft } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Shield, Lock, Upload, FileText, X, ArrowRight, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { base44 } from "@/api/base44Client";
@@ -18,20 +12,15 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 export default function SecureSubmit() {
-  const [step, setStep] = useState(1);
   const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [checkoutInfo, setCheckoutInfo] = useState(null);
-  const [checkingPayment, setCheckingPayment] = useState(true);
   const [formData, setFormData] = useState({
     caseNumber: "",
     attorney: "",
     firm: "",
     email: "",
     phone: "",
-    serviceType: "",
     county: "",
     respondentName: "",
     respondentAddress: "",
@@ -39,27 +28,6 @@ export default function SecureSubmit() {
     respondentEmployerAddress: "",
     specialInstructions: "",
   });
-
-  React.useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('paid') === '1') {
-      const stored = localStorage.getItem('ups_checkout');
-      if (stored) {
-        const info = JSON.parse(stored);
-        setCheckoutInfo(info);
-        setFormData(prev => ({ ...prev, serviceType: info.serviceType }));
-        setCheckingPayment(false);
-        return;
-      }
-    }
-    // Also allow zelle/venmo flow from manual payment page
-    const method = params.get('method');
-    if (method === 'zelle' || method === 'venmo') {
-      setCheckingPayment(false);
-      return;
-    }
-    window.location.href = '/pricing';
-  }, []);
 
   const utahCounties = [
     "Beaver", "Box Elder", "Cache", "Carbon", "Daggett", "Davis", "Duchesne",
@@ -70,7 +38,7 @@ export default function SecureSubmit() {
 
   const handleFileChange = (e) => {
     const selected = Array.from(e.target.files);
-    const valid = selected.filter((f) => f.size <= 25 * 1024 * 1024); // 25MB limit
+    const valid = selected.filter((f) => f.size <= 25 * 1024 * 1024);
     const invalid = selected.filter((f) => f.size > 25 * 1024 * 1024);
     if (invalid.length > 0) toast.error("Some files exceed the 25MB limit and were excluded.");
     setFiles((prev) => [...prev, ...valid.map((f) => ({ file: f, name: f.name, size: f.size }))]);
@@ -91,7 +59,7 @@ export default function SecureSubmit() {
     setSubmitting(true);
 
     try {
-      // Upload files if any
+      // Upload files
       const uploadedUrls = [];
       if (files.length > 0) {
         setUploading(true);
@@ -102,125 +70,20 @@ export default function SecureSubmit() {
         setUploading(false);
       }
 
-      // Save case to database
-      await base44.entities.Case.create({
-        case_number: formData.caseNumber,
-        attorney: formData.attorney,
-        firm: formData.firm,
-        email: formData.email,
-        phone: formData.phone,
-        service_type: formData.serviceType,
-        county: formData.county,
-        respondent_name: formData.respondentName,
-        respondent_address: formData.respondentAddress,
-        respondent_employer: formData.respondentEmployer,
-        respondent_employer_address: formData.respondentEmployerAddress,
-        special_instructions: formData.specialInstructions,
+      // Persist submission for the payment step — case is created after payment
+      localStorage.setItem("ups_submission", JSON.stringify({
+        formData,
         document_urls: uploadedUrls,
-        checkout_id: checkoutInfo?.sessionId || "",
-        payment_status: checkoutInfo?.paymentMethod === "stripe" || checkoutInfo?.paymentMethod === "paypal" ? "paid" : "pending",
-        payment_method: checkoutInfo?.paymentMethod || new URLSearchParams(window.location.search).get("method") || "other",
-        payment_received: checkoutInfo?.paymentMethod === "stripe" || checkoutInfo?.paymentMethod === "paypal",
-        package_name: checkoutInfo?.packageName || "",
-        package_price: checkoutInfo?.packagePrice || "",
-        status: "pending",
         submitted_at: new Date().toISOString(),
-      });
+      }));
 
-      setSubmitted(true);
-      localStorage.removeItem('ups_checkout');
-
-      // Send confirmation email (non-blocking)
-      base44.integrations.Core.SendEmail({
-        to: formData.email,
-        subject: `Document Submission Confirmed — Case ${formData.caseNumber || "N/A"}`,
-        body: `
-Dear ${formData.attorney || "Valued Client"},
-
-Your secure document submission has been received by Utah Process Servers.
-
-Submission Details:
-- Case Number: ${formData.caseNumber || "Not provided"}
-- Service Type: ${formData.serviceType}
-- County: ${formData.county} County
-- Respondent: ${formData.respondentName}
-- Files Submitted: ${uploadedUrls.length > 0 ? uploadedUrls.map((f) => f.name).join(", ") : "None"}
-
-A member of our team will review your submission and contact you within one business hour to confirm service assignment and provide a tracking number.
-
-For urgent matters, please call us directly at (801) 555-5555.
-
-Utah Process Servers
-Licensed & Bonded in Utah
-        `.trim(),
-      }).catch(() => {}); // fire-and-forget
+      window.location.href = "/pricing";
     } catch (err) {
       toast.error("Submission failed. Please try again or call us directly.");
-    } finally {
       setSubmitting(false);
       setUploading(false);
     }
   };
-
-  if (checkingPayment) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="w-8 h-8 border-4 border-border border-t-primary rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  if (submitted) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <div className="flex items-center justify-center min-h-screen px-6 pt-24">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="max-w-lg w-full text-center"
-          >
-            <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle className="w-8 h-8 text-green-600" />
-            </div>
-            <h2 className="font-heading text-3xl font-bold text-foreground mb-4">
-              Submission Received
-            </h2>
-            <p className="text-muted-foreground leading-relaxed mb-8">
-              Your documents have been securely transmitted to Utah Process Servers.
-              A confirmation has been sent to <strong>{formData.email}</strong>. A coordinator
-              will contact you within one business hour with your case assignment.
-            </p>
-            <div className="bg-muted/50 border border-border rounded-xl p-6 text-left mb-8 space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Case Number</span>
-                <span className="font-medium">{formData.caseNumber || "—"}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Service Type</span>
-                <span className="font-medium">{formData.serviceType}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">County</span>
-                <span className="font-medium">{formData.county} County</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Files Submitted</span>
-                <span className="font-medium">{files.length}</span>
-              </div>
-            </div>
-            <Link to="/">
-              <Button variant="outline" className="gap-2">
-                <ArrowLeft className="w-4 h-4" />
-                Back to Home
-              </Button>
-            </Link>
-          </motion.div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -239,14 +102,15 @@ Licensed & Bonded in Utah
             </div>
             <div>
               <p className="text-xs tracking-[0.2em] uppercase text-[#C4A265] font-semibold mb-3">
-                Encrypted Document Portal
+                Step 1 of 2 — Encrypted Document Portal
               </p>
               <h1 className="font-heading text-3xl md:text-4xl font-bold text-white leading-tight">
                 Secure Document Submission
               </h1>
               <p className="mt-4 text-white/50 text-base leading-relaxed max-w-xl">
-                Submit your legal documents directly to our team for process service assignment.
-                All uploads are encrypted in transit and at rest.
+                Submit your legal documents and case details for process service assignment.
+                All uploads are encrypted in transit and at rest. After submission, you'll select
+                your service package and complete payment.
               </p>
             </div>
           </div>
@@ -317,28 +181,21 @@ Licensed & Bonded in Utah
             </div>
             <div className="grid sm:grid-cols-2 gap-6 bg-muted/30 border border-border rounded-xl p-6">
               <div>
-                <label className="text-sm font-medium text-foreground mb-2 block">Service Type *</label>
-                <Select required value={formData.serviceType} onValueChange={(val) => !checkoutInfo && setFormData({ ...formData, serviceType: val })} disabled={!!checkoutInfo}>
-                  <SelectTrigger className="bg-background"><SelectValue placeholder="Select service type" /></SelectTrigger>
+                <label className="text-sm font-medium text-foreground mb-2 block">County for Service *</label>
+                <Select required value={formData.county} onValueChange={(val) => setFormData({ ...formData, county: val })}>
+                  <SelectTrigger className="bg-background"><SelectValue placeholder="Select Utah county" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Standard Service">Standard Service (3–5 days)</SelectItem>
-                    <SelectItem value="Rush Service">Rush Service (24 hours)</SelectItem>
-                    <SelectItem value="Same-Day Service">Same-Day Service</SelectItem>
-                    <SelectItem value="Skip Tracing">Skip Tracing & Locate</SelectItem>
-                    <SelectItem value="Substitute Service">Substitute Service</SelectItem>
-                    <SelectItem value="Corporate Service">Corporate Service</SelectItem>
-                    <SelectItem value="Eviction Notice">Eviction Notice</SelectItem>
-                    <SelectItem value="Subpoena Service">Subpoena Service</SelectItem>
-                    <SelectItem value="Court Filing">Court Filing</SelectItem>
+                    {utahCounties.map((c) => (
+                      <SelectItem key={c} value={c}>{c} County</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
-
               <div>
                 <label className="text-sm font-medium text-foreground mb-2 block">Respondent / Subject Name *</label>
                 <Input required value={formData.respondentName} onChange={(e) => setFormData({ ...formData, respondentName: e.target.value })} placeholder="Full legal name" className="bg-background" />
               </div>
-              <div>
+              <div className="sm:col-span-2">
                 <label className="text-sm font-medium text-foreground mb-2 block">Known Address</label>
                 <Input value={formData.respondentAddress} onChange={(e) => setFormData({ ...formData, respondentAddress: e.target.value })} placeholder="Street, City, State, ZIP" className="bg-background" />
               </div>
@@ -424,7 +281,8 @@ Licensed & Bonded in Utah
             className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pt-4"
           >
             <p className="text-xs text-muted-foreground max-w-sm leading-relaxed">
-              By submitting, you confirm all information is accurate and authorize Utah Process Servers to serve the listed documents on your behalf.
+              By continuing, you confirm all information is accurate. You'll select your service package
+              and complete payment on the next step.
             </p>
             <Button
               type="submit"
@@ -434,12 +292,12 @@ Licensed & Bonded in Utah
               {submitting ? (
                 <span className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                  {uploading ? "Uploading Files..." : "Submitting..."}
+                  {uploading ? "Uploading Files..." : "Saving..."}
                 </span>
               ) : (
                 <span className="flex items-center gap-2">
-                  <Lock className="w-4 h-4" />
-                  Submit Securely
+                  Continue to Payment
+                  <ArrowRight className="w-4 h-4" />
                 </span>
               )}
             </Button>

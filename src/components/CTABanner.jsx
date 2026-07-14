@@ -33,7 +33,7 @@ export default function CTABanner() {
               us for reliable, court-compliant process service.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10">
-              <Link to="/pricing">
+              <Link to="/submit">
                 <Button className="bg-[#C4A265] text-[#1A1C1E] hover:bg-[#C4A265]/90 font-semibold text-base px-8 py-6 tracking-wide">
                   Request Service Now
                   <ArrowRight className="w-4 h-4 ml-2" />

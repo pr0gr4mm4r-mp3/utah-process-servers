@@ -18,7 +18,8 @@ export default function Pricing() {
             Service & Pricing
           </h1>
           <p className="text-white/50 text-base max-w-xl mx-auto">
-            Select your service package below. After payment, you'll submit your documents securely.
+            Select your service package below to complete payment. If you haven't submitted your
+            documents yet, you'll be prompted to do so first.
           </p>
           <div className="flex flex-wrap justify-center gap-6 mt-8">
             {[
