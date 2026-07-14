@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
-import { Smartphone, Loader2, X } from "lucide-react";
+import { Smartphone, Loader2, X, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -17,6 +17,8 @@ export default function PaymentMethodSelector({ pkg, onClose }) {
   const [loadingConfig, setLoadingConfig] = useState(true);
   const [loadingPaypal, setLoadingPaypal] = useState(false);
   const [paypalReady, setPaypalReady] = useState(false);
+  const [paypalError, setPaypalError] = useState(null);
+  const [paypalRetryKey, setPaypalRetryKey] = useState(0);
 
   useEffect(() => {
     base44.functions.invoke("getPaymentConfig").then((res) => {
@@ -45,10 +47,13 @@ export default function PaymentMethodSelector({ pkg, onClose }) {
   useEffect(() => {
     if (!paypalReady || !config?.paypalClientId) return;
     const container = document.getElementById("paypal-button-container");
-    if (!container || container.children.length > 0) return;
+    if (!container) return;
+    // Clear any previous buttons (for retries)
+    container.innerHTML = "";
 
     window.paypal.Buttons({
       createOrder: (data, actions) => {
+        setPaypalError(null);
         return actions.order.create({
           purchase_units: [{
             description: pkg.name,
@@ -58,6 +63,7 @@ export default function PaymentMethodSelector({ pkg, onClose }) {
       },
       onApprove: (data, actions) => {
         setLoadingPaypal(true);
+        setPaypalError(null);
         return base44.functions.invoke("paypalCaptureOrder", { orderID: data.orderID })
           .then((res) => {
             setLoadingPaypal(false);
@@ -71,20 +77,24 @@ export default function PaymentMethodSelector({ pkg, onClose }) {
               }));
               window.location.href = "/thank-you";
             } else {
-              toast.error(res.data?.error || "Payment could not be verified. Please contact us.");
+              setPaypalError(res.data?.error || "Payment could not be verified by PayPal. You can try the PayPal button again below — your submission is saved.");
+              toast.error("Payment could not be verified. Please try again.");
             }
           })
           .catch(() => {
             setLoadingPaypal(false);
+            setPaypalError("Payment verification failed. You can try the PayPal button again below — your submission is saved.");
             toast.error("Payment verification failed. Please try again or contact us.");
           });
       },
       onError: (err) => {
         console.error("PayPal error:", err);
-        toast.error("PayPal checkout failed. Please try another method.");
+        setLoadingPaypal(false);
+        setPaypalError("PayPal checkout encountered an error. You can try again below or use another payment method.");
+        toast.error("PayPal checkout failed. Please try again or use another method.");
       },
     }).render("#paypal-button-container");
-  }, [paypalReady, pkg]);
+  }, [paypalReady, pkg, paypalRetryKey]);
 
   const handleManual = (method) => {
     const params = new URLSearchParams({
@@ -136,12 +146,19 @@ export default function PaymentMethodSelector({ pkg, onClose }) {
                     Pay with PayPal
                   </div>
                   <div className="px-4 pb-3">
-                    {loadingPaypal ? (
-                      <div className="flex items-center justify-center py-6">
+                    {loadingPaypal && (
+                      <div className="flex items-center justify-center py-4 mb-3 bg-muted/30 rounded-lg">
                         <Loader2 className="w-5 h-5 animate-spin text-primary" />
                         <span className="ml-2 text-sm text-muted-foreground">Verifying payment...</span>
                       </div>
-                    ) : paypalReady ? (
+                    )}
+                    {paypalError && (
+                      <div className="mb-3 p-3 bg-destructive/10 border border-destructive/20 rounded-lg text-sm text-destructive flex items-start gap-2">
+                        <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                        <span>{paypalError}</span>
+                      </div>
+                    )}
+                    {paypalReady ? (
                       <div id="paypal-button-container" />
                     ) : (
                       <div className="flex items-center justify-center py-4">
