@@ -130,7 +130,7 @@ Licensed & Bonded in Utah`.trim(),
 
 This is a courtesy notification from Utah Process Servers.
 
-We have made Service Attempt #${attemptNumber} of 3 to deliver your legal documents to the respondent.
+We have made Service Attempt #${attemptNumber} of 3 to serve your legal documents on the respondent.
 
 Case Details:
 - Case Number: ${caseData.case_number || "N/A"}
@@ -265,7 +265,12 @@ Licensed & Bonded in Utah`.trim(),
                         {[1, 2, 3].map((n) => (
                           <button
                             key={n}
-                            onClick={() => serviceAttempts < n && handleRecordAttempt(n)}
+                            onClick={() => {
+                              if (serviceAttempts >= n || recordingAttempt) return;
+                              if (window.confirm(`Confirm recording Service Attempt #${n}? This will notify the client and cannot be undone.`)) {
+                                handleRecordAttempt(n);
+                              }
+                            }}
                             disabled={recordingAttempt || serviceAttempts >= n}
                             className={`flex flex-col items-center justify-center w-16 h-16 rounded-xl border-2 text-sm font-bold transition-all ${
                               serviceAttempts >= n
@@ -299,7 +304,7 @@ Licensed & Bonded in Utah`.trim(),
                       </p>
                     </div>
                     <div>
-                      <p className="text-muted-foreground text-xs mb-1">Delivered At</p>
+                      <p className="text-muted-foreground text-xs mb-1">Served At</p>
                       <input
                         type="datetime-local"
                         value={deliveredAt}
@@ -407,7 +412,7 @@ Licensed & Bonded in Utah`.trim(),
                     <SelectContent>
                       <SelectItem value="pending">Pending</SelectItem>
                       <SelectItem value="in_progress">In Progress</SelectItem>
-                      <SelectItem value="delivered">Delivered</SelectItem>
+                      <SelectItem value="delivered">Served</SelectItem>
                       <SelectItem value="failed">Failed</SelectItem>
                     </SelectContent>
                   </Select>

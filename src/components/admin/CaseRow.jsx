@@ -12,7 +12,7 @@ const STATUS_STYLES = {
 const STATUS_LABELS = {
   pending: "Pending",
   in_progress: "In Progress",
-  delivered: "Delivered",
+  delivered: "Served",
   failed: "Failed",
 };
 

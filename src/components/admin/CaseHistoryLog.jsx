@@ -6,7 +6,7 @@ import { Clock, CheckCircle, AlertCircle, Target } from "lucide-react";
 const STATUS_LABELS = {
   pending: "Pending",
   in_progress: "In Progress",
-  delivered: "Delivered",
+  delivered: "Served",
   failed: "Failed",
 };
 

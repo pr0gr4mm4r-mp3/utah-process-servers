@@ -12,7 +12,7 @@ import InviteUserModal from "@/components/admin/InviteUserModal";
 
 const TABS = [
   { key: "submitted", label: "By Date Submitted" },
-  { key: "delivered", label: "By Date Delivered" },
+  { key: "delivered", label: "By Date Served" },
   { key: "pending", label: "Pending" },
 ];
 
@@ -175,7 +175,7 @@ export default function AdminDashboard() {
             { label: "Total Cases", value: stats.total, icon: FileText, color: "text-foreground" },
             { label: "Pending", value: stats.pending, icon: Clock, color: "text-yellow-600" },
             { label: "In Progress", value: stats.in_progress, icon: AlertCircle, color: "text-blue-600" },
-            { label: "Delivered", value: stats.delivered, icon: CheckCircle, color: "text-green-600" },
+            { label: "Served", value: stats.delivered, icon: CheckCircle, color: "text-green-600" },
           ].map((stat) => (
             <motion.div
               key={stat.label}
