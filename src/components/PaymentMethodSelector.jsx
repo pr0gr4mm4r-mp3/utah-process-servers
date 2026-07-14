@@ -57,16 +57,27 @@ export default function PaymentMethodSelector({ pkg, onClose }) {
         });
       },
       onApprove: (data, actions) => {
-        return actions.order.capture().then(() => {
-          localStorage.setItem("ups_checkout", JSON.stringify({
-            sessionId: data.orderID,
-            packageName: pkg.name,
-            packagePrice: pkg.price,
-            serviceType: pkg.serviceType,
-            paymentMethod: "paypal",
-          }));
-          window.location.href = "/thank-you";
-        });
+        setLoadingPaypal(true);
+        return base44.functions.invoke("paypalCaptureOrder", { orderID: data.orderID })
+          .then((res) => {
+            setLoadingPaypal(false);
+            if (res.data?.success) {
+              localStorage.setItem("ups_checkout", JSON.stringify({
+                sessionId: data.orderID,
+                packageName: pkg.name,
+                packagePrice: pkg.price,
+                serviceType: pkg.serviceType,
+                paymentMethod: "paypal",
+              }));
+              window.location.href = "/thank-you";
+            } else {
+              toast.error(res.data?.error || "Payment could not be verified. Please contact us.");
+            }
+          })
+          .catch(() => {
+            setLoadingPaypal(false);
+            toast.error("Payment verification failed. Please try again or contact us.");
+          });
       },
       onError: (err) => {
         console.error("PayPal error:", err);
@@ -125,7 +136,12 @@ export default function PaymentMethodSelector({ pkg, onClose }) {
                     Pay with PayPal
                   </div>
                   <div className="px-4 pb-3">
-                    {paypalReady ? (
+                    {loadingPaypal ? (
+                      <div className="flex items-center justify-center py-6">
+                        <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                        <span className="ml-2 text-sm text-muted-foreground">Verifying payment...</span>
+                      </div>
+                    ) : paypalReady ? (
                       <div id="paypal-button-container" />
                     ) : (
                       <div className="flex items-center justify-center py-4">
