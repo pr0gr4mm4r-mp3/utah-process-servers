@@ -38,6 +38,13 @@
       "type": "string",
       "description": "Known address of respondent"
     },
+    "additional_addresses": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Additional known addresses for the respondent"
+    },
     "respondent_employer": {
       "type": "string",
       "description": "Respondent employer or company name"

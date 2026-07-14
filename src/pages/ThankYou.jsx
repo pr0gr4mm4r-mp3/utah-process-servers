@@ -58,6 +58,7 @@ export default function ThankYou() {
           county: fd.county,
           respondent_name: fd.respondentName,
           respondent_address: fd.respondentAddress,
+          additional_addresses: fd.additionalAddresses || [],
           respondent_employer: fd.respondentEmployer,
           respondent_employer_address: fd.respondentEmployerAddress,
           special_instructions: fd.specialInstructions,

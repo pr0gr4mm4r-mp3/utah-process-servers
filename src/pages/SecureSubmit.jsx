@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Shield, Lock, Upload, FileText, X, ArrowRight, ArrowLeft } from "lucide-react";
+import { Shield, Lock, Upload, FileText, X, ArrowRight, ArrowLeft, Plus, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { base44 } from "@/api/base44Client";
@@ -18,6 +18,7 @@ export default function SecureSubmit() {
   const [pkg, setPkg] = useState(null);
   const [showPayment, setShowPayment] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [additionalAddresses, setAdditionalAddresses] = useState([]);
   const [formData, setFormData] = useState({
     caseNumber: "",
     attorney: "",
@@ -81,7 +82,7 @@ export default function SecureSubmit() {
 
       // Persist submission for the payment step — case is created after payment
       localStorage.setItem("ups_submission", JSON.stringify({
-        formData,
+        formData: { ...formData, additionalAddresses: additionalAddresses.filter((a) => a.trim() !== "") },
         document_urls: uploadedUrls,
         submitted_at: new Date().toISOString(),
       }));
@@ -207,6 +208,47 @@ export default function SecureSubmit() {
               <div className="sm:col-span-2">
                 <label className="text-sm font-medium text-foreground mb-2 block">Known Address</label>
                 <Input value={formData.respondentAddress} onChange={(e) => setFormData({ ...formData, respondentAddress: e.target.value })} placeholder="Street, City, State, ZIP" className="bg-background" />
+              </div>
+
+              {/* Additional addresses */}
+              <div className="sm:col-span-2">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-sm font-medium text-foreground">Additional Addresses</label>
+                  <button
+                    type="button"
+                    onClick={() => setAdditionalAddresses((prev) => [...prev, ""])}
+                    className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    Add another address
+                  </button>
+                </div>
+                {additionalAddresses.length === 0 ? (
+                  <p className="text-xs text-muted-foreground italic">Add more addresses if the respondent may be found at multiple locations.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {additionalAddresses.map((addr, i) => (
+                      <div key={i} className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-1">
+                          <MapPin className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                          <Input
+                            value={addr}
+                            onChange={(e) => setAdditionalAddresses((prev) => prev.map((a, idx) => idx === i ? e.target.value : a))}
+                            placeholder="Street, City, State, ZIP"
+                            className="bg-background"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setAdditionalAddresses((prev) => prev.filter((_, idx) => idx !== i))}
+                          className="text-muted-foreground hover:text-destructive transition-colors flex-shrink-0"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
               <div className="sm:col-span-2 border-t border-border pt-6 mt-2">
                 <p className="text-xs tracking-[0.15em] uppercase text-muted-foreground font-semibold mb-4">Respondent Employment Information <span className="normal-case font-normal">(optional)</span></p>
