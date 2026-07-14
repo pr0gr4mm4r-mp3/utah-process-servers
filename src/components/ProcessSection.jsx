@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Upload, MapPin, Zap, CheckCircle } from "lucide-react";
+import SectionCta from "@/components/SectionCta";
 
 const steps = [
   {
@@ -97,6 +98,8 @@ export default function ProcessSection() {
             ))}
           </div>
         </div>
+
+        <SectionCta />
       </div>
     </section>
   );

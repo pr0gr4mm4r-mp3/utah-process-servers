@@ -1,5 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
+import SectionCta from "@/components/SectionCta";
 
 const cities = [
   "Salt Lake City", "West Valley City", "Murray", "Millcreek",
@@ -96,6 +97,8 @@ export default function CoverageSection() {
             ))}
           </div>
         </motion.div>
+
+        <SectionCta />
       </div>
     </section>
   );

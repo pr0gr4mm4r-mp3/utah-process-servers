@@ -1,5 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
+import SectionCta from "@/components/SectionCta";
 
 const benefits = [
   {
@@ -93,6 +94,8 @@ export default function BenefitsSection() {
             </motion.div>
           ))}
         </div>
+
+        <SectionCta />
       </div>
     </section>
   );

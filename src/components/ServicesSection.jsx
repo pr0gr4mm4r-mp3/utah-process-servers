@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { FileText, Users, Building2, Scale, Gavel } from "lucide-react";
+import SectionCta from "@/components/SectionCta";
 
 const services = [
   {
@@ -79,6 +80,8 @@ export default function ServicesSection() {
             </motion.div>
           ))}
         </div>
+
+        <SectionCta />
       </div>
     </section>
   );
