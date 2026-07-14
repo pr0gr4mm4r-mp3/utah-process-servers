@@ -16,6 +16,7 @@ import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
 import ZelleVenmoPayment from '@/pages/ZelleVenmoPayment';
+import CaseLookup from '@/pages/CaseLookup';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { Navigate } from 'react-router-dom';
 // Add page imports here
@@ -55,6 +56,7 @@ const AuthenticatedApp = () => {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/payment-manual" element={<ZelleVenmoPayment />} />
+      <Route path="/case-lookup" element={<CaseLookup />} />
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
         <Route path="/admin" element={<AdminDashboard />} />
       </Route>

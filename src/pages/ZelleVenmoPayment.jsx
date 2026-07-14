@@ -13,6 +13,8 @@ export default function ZelleVenmoPayment() {
   const packageName = searchParams.get("packageName") || "";
   const packagePrice = searchParams.get("packagePrice") || "";
   const serviceType = searchParams.get("serviceType") || "";
+  const caseId = searchParams.get("caseId") || "";
+  const lookupEmail = searchParams.get("email") || "";
 
   const [config, setConfig] = useState({ zelleEmail: "", venmoHandle: "" });
 
@@ -29,7 +31,18 @@ export default function ZelleVenmoPayment() {
   const venmoRecipient = config.venmoHandle || "";
   const recipient = isVenmo ? venmoRecipient : zelleRecipient;
 
-  const handleProceedToSubmit = () => {
+  const handleProceedToSubmit = async () => {
+    if (caseId) {
+      try {
+        await base44.functions.invoke("updateCasePayment", {
+          caseId,
+          paymentMethod: selectedMethod,
+          isInstant: false,
+        });
+      } catch {}
+      window.location.href = `/case-lookup?email=${encodeURIComponent(lookupEmail)}`;
+      return;
+    }
     localStorage.setItem("ups_checkout", JSON.stringify({
       sessionId: `${selectedMethod}-manual-${Date.now()}`,
       packageName,

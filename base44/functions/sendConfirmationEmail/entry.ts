@@ -3,7 +3,7 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    const { to, attorney, caseNumber, isInstant, checkout, submission } = await req.json();
+    const { to, attorney, caseNumber, caseId, isInstant, checkout, submission } = await req.json();
 
     if (!to) {
       return Response.json({ error: "Missing recipient email (to)" }, { status: 400 });
@@ -13,6 +13,7 @@ Deno.serve(async (req) => {
     const serviceType = (checkout && (checkout.serviceType || checkout.packageName)) || "Process Service";
     const county = fd.county || "—";
     const respondent = fd.respondentName || "—";
+    const caseReference = caseId ? `UPS-${caseId.slice(-8).toUpperCase()}` : "N/A";
     const files = (submission && submission.document_urls ? submission.document_urls : [])
       .map((f) => f.name)
       .join(", ") || "None";
@@ -29,6 +30,7 @@ Deno.serve(async (req) => {
 Your secure document submission has been received by Utah Process Servers and your payment has been ${paymentStatusWord}.
 
 Submission Details:
+- Case Reference: ${caseReference}
 - Case Number: ${caseNumber || fd.caseNumber || "Not provided"}
 - Service Type: ${serviceType}
 - County: ${county} County
@@ -37,6 +39,8 @@ Submission Details:
 
 ${followUp}
 
+You can check your case status and payment at any time using the Case Lookup page on our website — enter your email address to view all your cases.
+
 For urgent matters, please call us directly at (801) 755-5445.
 
 Utah Process Servers
@@ -44,7 +48,7 @@ Licensed & Bonded in Utah`;
 
     await base44.asServiceRole.integrations.Core.SendEmail({
       to,
-      subject: `Submission Confirmed — Case ${caseNumber || fd.caseNumber || "N/A"}`,
+      subject: `Submission Confirmed — Case Ref ${caseReference}`,
       body,
     });
 

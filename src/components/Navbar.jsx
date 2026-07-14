@@ -69,6 +69,9 @@ export default function Navbar() {
             </div>
 
             <div className="hidden lg:flex items-center gap-4">
+              <Link to="/case-lookup" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors tracking-wide uppercase">
+                Case Lookup
+              </Link>
               <Link to="/pricing">
                 <Button className="bg-primary text-primary-foreground hover:bg-primary/90 font-medium tracking-wide text-sm px-6">
                   Get Started
@@ -125,6 +128,9 @@ export default function Navbar() {
                   </a>
                 )
               )}
+              <Link to="/case-lookup" onClick={() => setMobileOpen(false)} className="font-heading text-3xl font-medium text-foreground hover:text-primary transition-colors">
+                Case Lookup
+              </Link>
               <Link to="/pricing" onClick={() => setMobileOpen(false)} className="w-full mt-4">
                 <Button className="w-full bg-primary text-primary-foreground text-lg py-6">
                   Get Started

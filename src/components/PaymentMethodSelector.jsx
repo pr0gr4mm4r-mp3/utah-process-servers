@@ -12,7 +12,7 @@ const PayPalIcon = () => (
   </svg>
 );
 
-export default function PaymentMethodSelector({ pkg, onClose }) {
+export default function PaymentMethodSelector({ pkg, onClose, existingCase }) {
   const [config, setConfig] = useState(null);
   const [loadingConfig, setLoadingConfig] = useState(true);
   const [loadingPaypal, setLoadingPaypal] = useState(false);
@@ -68,14 +68,28 @@ export default function PaymentMethodSelector({ pkg, onClose }) {
           .then((res) => {
             setLoadingPaypal(false);
             if (res.data?.success) {
-              localStorage.setItem("ups_checkout", JSON.stringify({
-                sessionId: data.orderID,
-                packageName: pkg.name,
-                packagePrice: pkg.price,
-                serviceType: pkg.serviceType,
-                paymentMethod: "paypal",
-              }));
-              window.location.href = "/thank-you";
+              if (existingCase) {
+                base44.functions.invoke("updateCasePayment", {
+                  caseId: existingCase.id,
+                  paymentMethod: "paypal",
+                  checkoutId: data.orderID,
+                  isInstant: true,
+                }).then(() => {
+                  window.location.href = `/case-lookup?email=${encodeURIComponent(existingCase.email || "")}&paid=1`;
+                }).catch(() => {
+                  setLoadingPaypal(false);
+                  setPaypalError("Payment was captured but we couldn't update your case. Please contact us at (801) 755-5445.");
+                });
+              } else {
+                localStorage.setItem("ups_checkout", JSON.stringify({
+                  sessionId: data.orderID,
+                  packageName: pkg.name,
+                  packagePrice: pkg.price,
+                  serviceType: pkg.serviceType,
+                  paymentMethod: "paypal",
+                }));
+                window.location.href = "/thank-you";
+              }
             } else {
               setPaypalError(res.data?.error || "Payment could not be verified by PayPal. You can try the PayPal button again below — your submission is saved.");
               toast.error("Payment could not be verified. Please try again.");
@@ -103,6 +117,10 @@ export default function PaymentMethodSelector({ pkg, onClose }) {
       packagePrice: pkg.price,
       serviceType: pkg.serviceType,
     });
+    if (existingCase) {
+      params.set("caseId", existingCase.id);
+      if (existingCase.email) params.set("email", existingCase.email);
+    }
     window.location.href = `/payment-manual?${params.toString()}`;
   };
 

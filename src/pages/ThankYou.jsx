@@ -78,6 +78,7 @@ export default function ThankYou() {
           to: fd.email,
           attorney: fd.attorney,
           caseNumber: fd.caseNumber,
+          caseId: created.id,
           isInstant,
           checkout,
           submission,
