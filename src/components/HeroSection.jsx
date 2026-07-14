@@ -17,7 +17,7 @@ export default function HeroSection() {
         <div className="absolute inset-0 bg-gradient-to-r from-[#1A1C1E]/90 via-[#1A1C1E]/70 to-[#1A1C1E]/40" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 w-full pt-32 pb-20 lg:pt-0 lg:pb-0">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 w-full pt-32 pb-48 lg:pt-0 lg:pb-0">
         <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
           {/* Left — headline */}
           <motion.div
@@ -43,16 +43,16 @@ export default function HeroSection() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 mt-10">
-              <Link to="/pricing">
-                <Button className="bg-[#C4A265] text-[#1A1C1E] hover:bg-[#C4A265]/90 font-semibold text-base px-8 py-6 tracking-wide">
+              <Link to="/pricing" className="w-full sm:w-auto">
+                <Button className="w-full bg-[#C4A265] text-[#1A1C1E] hover:bg-[#C4A265]/90 font-semibold text-base px-8 py-6 tracking-wide">
                   Request Service
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
-              <a href="tel:+18015555555">
+              <a href="tel:+18015555555" className="w-full sm:w-auto">
                 <Button
                   variant="outline"
-                  className="border-white/25 text-white hover:bg-white/10 font-medium text-base px-8 py-6 bg-transparent"
+                  className="w-full border-white/25 text-white hover:bg-white/10 font-medium text-base px-8 py-6 bg-transparent"
                 >
                   Call Now
                 </Button>
