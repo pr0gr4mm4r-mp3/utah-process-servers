@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Shield, Lock, Upload, FileText, X, ArrowRight, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
@@ -25,7 +24,7 @@ export default function SecureSubmit() {
     firm: "",
     email: "",
     phone: "",
-    county: "",
+    county: "Salt Lake",
     respondentName: "",
     respondentAddress: "",
     respondentEmployer: "",
@@ -45,13 +44,6 @@ export default function SecureSubmit() {
       window.location.href = "/pricing";
     }
   }, []);
-
-  const utahCounties = [
-    "Beaver", "Box Elder", "Cache", "Carbon", "Daggett", "Davis", "Duchesne",
-    "Emery", "Garfield", "Grand", "Iron", "Juab", "Kane", "Millard", "Morgan",
-    "Piute", "Rich", "Salt Lake", "San Juan", "Sanpete", "Sevier", "Summit",
-    "Tooele", "Uintah", "Utah", "Wasatch", "Washington", "Wayne", "Weber",
-  ];
 
   const handleFileChange = (e) => {
     const selected = Array.from(e.target.files);
@@ -205,15 +197,8 @@ export default function SecureSubmit() {
             </div>
             <div className="grid sm:grid-cols-2 gap-6 bg-muted/30 border border-border rounded-xl p-6">
               <div>
-                <label className="text-sm font-medium text-foreground mb-2 block">County for Service *</label>
-                <Select required value={formData.county} onValueChange={(val) => setFormData({ ...formData, county: val })}>
-                  <SelectTrigger className="bg-background"><SelectValue placeholder="Select Utah county" /></SelectTrigger>
-                  <SelectContent>
-                    {utahCounties.map((c) => (
-                      <SelectItem key={c} value={c}>{c} County</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <label className="text-sm font-medium text-foreground mb-2 block">County for Service</label>
+                <Input value="Salt Lake County" disabled className="bg-muted/50 text-muted-foreground" />
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground mb-2 block">Respondent / Subject Name *</label>
