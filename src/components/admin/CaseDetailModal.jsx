@@ -81,7 +81,7 @@ export default function CaseDetailModal({ caseData, onClose, onUpdate }) {
 
     // Send email when payment newly verified
     if (paymentReceived && wasNotPaid && caseData.email) {
-      await base44.integrations.Core.SendEmail({
+      await base44.functions.invoke("sendClientEmail", {
         to: caseData.email,
         subject: `Payment Confirmed — Your Case is Now Active`,
         body: `Dear ${caseData.attorney || "Valued Client"},
@@ -123,7 +123,7 @@ Licensed & Bonded in Utah`.trim(),
 
       // Email client
       if (caseData.email) {
-        await base44.integrations.Core.SendEmail({
+        await base44.functions.invoke("sendClientEmail", {
           to: caseData.email,
           subject: `Service Update — Attempt #${attemptNumber} on Your Case`,
           body: `Dear ${caseData.attorney || "Valued Client"},

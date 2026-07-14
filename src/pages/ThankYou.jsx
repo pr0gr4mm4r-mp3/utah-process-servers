@@ -72,8 +72,8 @@ export default function ThankYou() {
           submitted_at: submission.submitted_at || new Date().toISOString(),
         });
 
-        // Client confirmation email (non-blocking)
-        base44.integrations.Core.SendEmail({
+        // Client confirmation email (sent server-side so external emails are delivered)
+        base44.functions.invoke("sendClientEmail", {
           to: fd.email,
           subject: `Submission Confirmed — Case ${fd.caseNumber || "N/A"}`,
           body: `Dear ${fd.attorney || "Valued Client"},
