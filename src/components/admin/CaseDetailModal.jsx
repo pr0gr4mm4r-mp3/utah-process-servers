@@ -159,6 +159,34 @@ Licensed & Bonded in Utah`.trim(),
     }
   };
 
+  const handleRemoveAttempt = async () => {
+    if (recordingAttempt || serviceAttempts === 0) return;
+    setRecordingAttempt(true);
+    try {
+      const removedAttempt = serviceAttempts;
+      const newAttempts = serviceAttempts - 1;
+      await base44.entities.Case.update(caseData.id, {
+        service_attempts: newAttempts,
+      });
+
+      await base44.entities.StatusLog.create({
+        case_id: caseData.id,
+        event_type: "attempt",
+        attempt_number: removedAttempt,
+        note: "Attempt removed (deselected by admin)",
+      });
+
+      setServiceAttempts(newAttempts);
+      setLogKey((k) => k + 1);
+      onUpdate({ ...caseData, service_attempts: newAttempts });
+      toast.success(`Attempt #${removedAttempt} removed`);
+    } catch {
+      toast.error("Failed to remove attempt. Please try again.");
+    } finally {
+      setRecordingAttempt(false);
+    }
+  };
+
   const submittedDate = caseData.submitted_at || caseData.created_date;
 
   return (
@@ -259,22 +287,33 @@ Licensed & Bonded in Utah`.trim(),
                     </p>
                     <div className="bg-muted/30 border border-border rounded-xl p-4">
                       <p className="text-xs text-muted-foreground mb-3">
-                        Standard Service includes up to 3 attempts. Client receives an email notification for each attempt recorded.
+                        Standard Service includes up to 3 attempts. Client receives an email notification for each attempt recorded. Click the most recent attempt again to remove it if pressed by mistake.
                       </p>
                       <div className="flex items-center gap-3">
                         {[1, 2, 3].map((n) => (
                           <button
                             key={n}
+                            title={n === serviceAttempts ? `Click to remove Attempt #${n}` : undefined}
                             onClick={() => {
-                              if (serviceAttempts >= n || recordingAttempt) return;
-                              if (window.confirm(`Confirm recording Service Attempt #${n}? This will notify the client and cannot be undone.`)) {
-                                handleRecordAttempt(n);
+                              if (recordingAttempt) return;
+                              if (n === serviceAttempts) {
+                                if (window.confirm(`Remove Service Attempt #${n}? This will decrement the attempt count.`)) {
+                                  handleRemoveAttempt();
+                                }
+                                return;
+                              }
+                              if (serviceAttempts < n) {
+                                if (window.confirm(`Confirm recording Service Attempt #${n}? This will notify the client and cannot be undone.`)) {
+                                  handleRecordAttempt(n);
+                                }
                               }
                             }}
-                            disabled={recordingAttempt || serviceAttempts >= n}
+                            disabled={recordingAttempt || n < serviceAttempts}
                             className={`flex flex-col items-center justify-center w-16 h-16 rounded-xl border-2 text-sm font-bold transition-all ${
                               serviceAttempts >= n
-                                ? "border-primary bg-primary/10 text-primary"
+                                ? n === serviceAttempts
+                                  ? "border-primary bg-primary/10 text-primary hover:border-destructive/50 hover:bg-destructive/5 hover:text-destructive"
+                                  : "border-primary bg-primary/10 text-primary"
                                 : "border-border text-muted-foreground hover:border-primary/50 hover:text-primary"
                             } disabled:opacity-50 disabled:cursor-not-allowed`}
                           >
