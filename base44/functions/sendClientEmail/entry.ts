@@ -17,6 +17,13 @@ Deno.serve(async (req) => {
       body,
     });
 
+    // Send a copy to the primary inbox for record-keeping
+    await base44.asServiceRole.integrations.Core.SendEmail({
+      to: "utahproservers@yahoo.com",
+      subject: `[COPY] ${subject}`,
+      body: `This is a copy of a notification sent to ${to}.\n\n──────────────────────────────\n\n${body}`,
+    });
+
     return Response.json({ ok: true });
   } catch (error) {
     console.error("sendClientEmail error:", error.message);
