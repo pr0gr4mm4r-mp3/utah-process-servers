@@ -52,6 +52,16 @@ Licensed & Bonded in Utah`;
       body,
     });
 
+    // === OFFICE COPY (easily reversible) ===
+    // Sends a copy of every client confirmation to the primary inbox.
+    // To disable: delete or comment out this block.
+    await base44.asServiceRole.integrations.Core.SendEmail({
+      to: "utahproservers@yahoo.com",
+      subject: `[COPY] Submission Confirmed — Case Ref ${caseReference}`,
+      body: `This is a copy of a confirmation sent to ${to}.\n\n──────────────────────────────\n\n${body}`,
+    });
+    // === END OFFICE COPY ===
+
     return Response.json({ ok: true });
   } catch (error) {
     console.error("sendConfirmationEmail error:", error.message);
