@@ -256,7 +256,8 @@ Licensed & Bonded in Utah`.trim(),
                   <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold mb-3">Client Information</p>
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     {[
-                      ["Attorney", caseData.attorney],
+                      ["Plaintiff / Petitioner", caseData.attorney],
+                      ["Attorney Name", caseData.attorney_name || "—"],
                       ["Firm", caseData.firm || "—"],
                       ["Email", caseData.email],
                       ["Phone", caseData.phone || "—"],

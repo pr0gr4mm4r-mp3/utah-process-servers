@@ -8,7 +8,11 @@
     },
     "attorney": {
       "type": "string",
-      "description": "Attorney or client name"
+      "description": "Plaintiff or petitioner name"
+    },
+    "attorney_name": {
+      "type": "string",
+      "description": "Name of the representing attorney (optional)"
     },
     "firm": {
       "type": "string",
@@ -32,7 +36,7 @@
     },
     "respondent_name": {
       "type": "string",
-      "description": "Name of the respondent/subject"
+      "description": "Name of the respondent or defendant"
     },
     "respondent_address": {
       "type": "string",

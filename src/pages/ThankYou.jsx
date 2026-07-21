@@ -51,6 +51,7 @@ export default function ThankYou() {
         const created = await base44.entities.Case.create({
           case_number: fd.caseNumber,
           attorney: fd.attorney,
+          attorney_name: fd.attorneyName,
           firm: fd.firm,
           email: fd.email,
           phone: fd.phone,

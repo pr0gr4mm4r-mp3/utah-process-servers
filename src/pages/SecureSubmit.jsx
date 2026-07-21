@@ -22,6 +22,7 @@ export default function SecureSubmit() {
   const [formData, setFormData] = useState({
     caseNumber: "",
     attorney: "",
+    attorneyName: "",
     firm: "",
     email: "",
     phone: "",
@@ -164,8 +165,12 @@ export default function SecureSubmit() {
             </div>
             <div className="grid sm:grid-cols-2 gap-6 bg-muted/30 border border-border rounded-xl p-6">
               <div>
-                <label className="text-sm font-medium text-foreground mb-2 block">Attorney / Client Name *</label>
-                <Input required value={formData.attorney} onChange={(e) => setFormData({ ...formData, attorney: e.target.value })} placeholder="John Smith, Esq." className="bg-background" />
+                <label className="text-sm font-medium text-foreground mb-2 block">Plaintiff / Petitioner *</label>
+                <Input required value={formData.attorney} onChange={(e) => setFormData({ ...formData, attorney: e.target.value })} placeholder="Full legal name of plaintiff or petitioner" className="bg-background" />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-foreground mb-2 block">Attorney Name <span className="text-muted-foreground font-normal">(optional)</span></label>
+                <Input value={formData.attorneyName} onChange={(e) => setFormData({ ...formData, attorneyName: e.target.value })} placeholder="John Smith, Esq." className="bg-background" />
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground mb-2 block">Law Firm / Organization</label>
@@ -202,7 +207,7 @@ export default function SecureSubmit() {
                 <Input value="Salt Lake County" disabled className="bg-muted/50 text-muted-foreground" />
               </div>
               <div>
-                <label className="text-sm font-medium text-foreground mb-2 block">Respondent / Subject Name *</label>
+                <label className="text-sm font-medium text-foreground mb-2 block">Respondent / Defendant *</label>
                 <Input required value={formData.respondentName} onChange={(e) => setFormData({ ...formData, respondentName: e.target.value })} placeholder="Full legal name" className="bg-background" />
               </div>
               <div className="sm:col-span-2">
