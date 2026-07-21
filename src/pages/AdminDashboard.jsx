@@ -11,9 +11,9 @@ import CaseDetailModal from "@/components/admin/CaseDetailModal";
 import InviteUserModal from "@/components/admin/InviteUserModal";
 
 const TABS = [
+  { key: "pending", label: "Pending" },
   { key: "submitted", label: "By Date Submitted" },
   { key: "delivered", label: "By Date Served" },
-  { key: "pending", label: "Pending" },
 ];
 
 const STATUS_COLORS = {
@@ -26,7 +26,7 @@ const STATUS_COLORS = {
 export default function AdminDashboard() {
   const [cases, setCases] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("submitted");
+  const [activeTab, setActiveTab] = useState("pending");
   const [search, setSearch] = useState("");
   const [selectedCase, setSelectedCase] = useState(null);
   const [newCount, setNewCount] = useState(0);
@@ -87,21 +87,11 @@ export default function AdminDashboard() {
     }
 
     if (activeTab === "submitted") {
-      const priority = (c) => {
-        if (c.status === "in_progress") return 0;
-        if (c.status === "pending" && !c.payment_received) return 1;
-        if (c.status === "pending" && c.payment_received) return 2;
-        if (c.status === "delivered") return 4;
-        return 3; // failed / other
-      };
-      list.sort((a, b) => {
-        const diff = priority(a) - priority(b);
-        if (diff !== 0) return diff;
-        return (
+      list.sort(
+        (a, b) =>
           new Date(b.submitted_at || b.created_date) -
           new Date(a.submitted_at || a.created_date)
-        );
-      });
+      );
     } else if (activeTab === "delivered") {
       list = list.filter((c) => c.delivered_at);
       list.sort((a, b) => new Date(b.delivered_at) - new Date(a.delivered_at));
@@ -141,7 +131,7 @@ export default function AdminDashboard() {
         <div className="flex items-center gap-4">
           {newCount > 0 && (
             <button
-              onClick={() => { setNewCount(0); setActiveTab("submitted"); }}
+              onClick={() => { setNewCount(0); setActiveTab("pending"); }}
               className="flex items-center gap-2 bg-[#C4A265]/15 border border-[#C4A265]/30 text-[#C4A265] px-3 py-1.5 rounded-lg text-sm font-medium animate-pulse"
             >
               <Bell className="w-4 h-4" />
