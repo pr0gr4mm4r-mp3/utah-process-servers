@@ -28,7 +28,7 @@ export default function HeroSection() {
             <div className="inline-flex items-center gap-2 border border-white/20 rounded-full px-4 py-1.5 mb-8">
               <div className="w-1.5 h-1.5 bg-[#C4A265] rounded-full animate-pulse" />
               <span className="text-xs font-medium text-white/70 tracking-widest uppercase">
-                Licensed &amp; Bonded in Utah
+                Serving the Salt Lake Valley for Over 15 Years
               </span>
             </div>
 
@@ -39,7 +39,7 @@ export default function HeroSection() {
             </h1>
 
             <p className="mt-8 text-lg text-white/60 max-w-lg leading-relaxed font-light">
-              Licensed and bonded process serving throughout Salt Lake County. We deliver legal documents to any address in the Salt Lake Valley with speed, accuracy, and full Rule 4 compliance.
+              For over 15 years, we have served the Salt Lake Valley with precision, compliance, and unwavering reliability. We deliver legal documents to any address in Salt Lake County with speed, accuracy, and full Rule 4 compliance.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 mt-10">

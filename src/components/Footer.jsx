@@ -18,9 +18,10 @@ export default function Footer() {
               </span>
             </div>
             <p className="text-white/45 max-w-md text-sm leading-relaxed">
-              Licensed and bonded process serving professionals. Delivering legal
-              documents with precision, compliance, and unwavering reliability
-              throughout the Salt Lake Valley.
+              For over 15 years, we have served the Salt Lake Valley with
+              professionalism and discretion. We deliver legal documents with
+              precision, compliance, and unwavering reliability throughout Salt
+              Lake County.
             </p>
           </div>
           <div className="flex gap-6 text-sm">
@@ -107,7 +108,7 @@ export default function Footer() {
         <div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-white/30">
             © {new Date().getFullYear()} Utah Process Servers. All rights reserved.
-            Licensed and bonded in the State of Utah.
+            Serving the Salt Lake Valley for over 15 years.
           </p>
           <div className="flex gap-6 text-xs text-white/30">
             <span>Privacy Policy</span>
