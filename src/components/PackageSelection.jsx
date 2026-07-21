@@ -16,7 +16,7 @@ const PACKAGES = [
   {
     id: "rush",
     name: "Rush Service",
-    price: "160.00",
+    price: "120.00",
     turnaround: "24 hours",
     description: "Priority handling for time-sensitive legal deadlines",
     features: ["24-hour turnaround", "Real-time status updates", "Priority server assignment"],
@@ -26,7 +26,7 @@ const PACKAGES = [
   {
     id: "same_day",
     name: "Same-Day Service",
-    price: "250.00",
+    price: "160.00",
     turnaround: "Same day",
     description: "Urgent same-day service for critical filings",
     features: ["Same-day completion", "Dedicated process server", "Immediate confirmation"],
@@ -101,13 +101,13 @@ export default function PackageSelection() {
   };
 
   return (
-    <div className="py-20">
+    <div className="py-10">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
         {/* Header */}
-        <div className="text-center mb-16">
-          <p className="text-xs tracking-[0.2em] uppercase text-primary font-semibold mb-4">Service Packages</p>
-          <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground mb-4">Select Your Service</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
+        <div className="text-center mb-10">
+          <p className="text-xs tracking-[0.2em] uppercase text-primary font-semibold mb-2">Service Packages</p>
+          <h2 className="font-heading text-2xl md:text-3xl font-bold text-foreground mb-2">Select Your Service</h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto text-sm">
             All packages include certified proof of service and court-admissible documentation.
           </p>
         </div>
