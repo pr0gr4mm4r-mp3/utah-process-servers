@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { FileText, Users, Building2, Scale, Gavel } from "lucide-react";
+import { FileText, Users, Building2, Scale, Gavel, Search } from "lucide-react";
 import SectionCta from "@/components/SectionCta";
 
 const services = [
@@ -33,6 +33,12 @@ const services = [
     title: "Eviction Notices",
     description:
       "Timely service of 3-day, 15-day, and other eviction notices in compliance with Utah landlord-tenant law.",
+  },
+  {
+    icon: Search,
+    title: "Skip Tracing",
+    description:
+      "Locate hard-to-find recipients through advanced skip tracing techniques, ensuring successful service of your legal documents.",
   },
 ];
 
