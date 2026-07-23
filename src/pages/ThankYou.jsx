@@ -72,6 +72,7 @@ export default function ThankYou() {
           package_price: checkout.packagePrice || "",
           status: "pending",
           submitted_at: submission.submitted_at || new Date().toISOString(),
+          text_notifications_opt_in: fd.textNotificationsOptIn || false,
         });
 
         // Client confirmation email (sent server-side so external emails are delivered)
