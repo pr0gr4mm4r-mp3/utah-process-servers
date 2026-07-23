@@ -77,6 +77,36 @@ export default function CaseDetailModal({ caseData, onClose, onUpdate }) {
         status,
       });
       setLogKey((k) => k + 1);
+
+      // Notify the client by email whenever their case status changes
+      if (caseData.email) {
+        const STATUS_EMAILS = {
+          pending: { subject: "Your Case is Now Pending", body: "Your case is now pending. We will begin service shortly." },
+          in_progress: { subject: "Your Case is Now In Progress", body: "We have begun working on your case. Our team is actively attempting to serve the documents." },
+          delivered: { subject: "Service Complete — Documents Served", body: "Your documents have been successfully served on the respondent. A proof of service will be provided to you." },
+          failed: { subject: "Service Update on Your Case", body: "We were unable to complete service on your case. Please contact us to discuss next steps." },
+        };
+        const info = STATUS_EMAILS[status];
+        if (info) {
+          await base44.functions.invoke("sendClientEmail", {
+            to: caseData.email,
+            subject: `${info.subject}${caseData.case_number ? ` — Case #${caseData.case_number}` : ""}`,
+            body: `Dear ${caseData.attorney || "Valued Client"},
+
+${info.body}
+
+Case Details:
+- Case Number: ${caseData.case_number || "N/A"}
+- Service Type: ${caseData.service_type}
+- Respondent: ${caseData.respondent_name}
+
+If you have any questions, please call us at (801) 755-5445 or email utahproservers@yahoo.com.
+
+Utah Process Servers
+Licensed & Bonded in Utah`.trim(),
+          });
+        }
+      }
     }
 
     // Send email when payment newly verified
@@ -99,6 +129,8 @@ Utah Process Servers
 Licensed & Bonded in Utah`.trim(),
       });
       toast.success("Case updated & payment confirmation sent");
+    } else if (status !== prevStatus) {
+      toast.success("Case updated & client notified of status change");
     } else {
       toast.success("Case updated successfully");
     }
