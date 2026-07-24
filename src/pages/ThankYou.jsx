@@ -6,10 +6,14 @@ import { motion } from "framer-motion";
 import { base44 } from "@/api/base44Client";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { getPackage } from "@/lib/packages";
+
+const addressCount = (c) =>
+  Math.max(1, [c.respondentAddress, ...(c.additionalAddresses || [])].filter((a) => a && a.trim()).length);
 
 export default function ThankYou() {
   const [status, setStatus] = useState("processing"); // processing | done | error
-  const [caseInfo, setCaseInfo] = useState(null);
+  const [summary, setSummary] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -20,27 +24,25 @@ export default function ThankYou() {
         const checkoutRaw = localStorage.getItem("ups_checkout");
 
         if (!submissionRaw || !checkoutRaw) {
-          // Nothing to finalize — send user back to start of the flow
           window.location.href = "/submit";
           return;
         }
 
         const submission = JSON.parse(submissionRaw);
         const checkout = JSON.parse(checkoutRaw);
-        const fd = submission.formData || {};
+        const clientInfo = submission.clientInfo || {};
+        const cases = submission.cases || [];
 
         const paymentMethod = checkout.paymentMethod || "other";
         const isInstant = paymentMethod === "paypal" || paymentMethod === "stripe";
 
-        // Prevent double-creation on refresh (set synchronously before the async create)
+        // Refresh guard
         if (localStorage.getItem("ups_finalized") === "1") {
           if (cancelled) return;
           setStatus("done");
-          setCaseInfo({
-            caseNumber: fd.caseNumber,
-            serviceType: checkout.serviceType || checkout.packageName,
-            county: fd.county,
-            packagePrice: checkout.packagePrice,
+          setSummary({
+            caseCount: cases.length,
+            total: checkout.packagePrice,
             paymentMethod,
             paymentReceived: isInstant,
           });
@@ -48,56 +50,88 @@ export default function ThankYou() {
         }
         localStorage.setItem("ups_finalized", "1");
 
-        const created = await base44.entities.Case.create({
-          case_number: fd.caseNumber,
-          attorney: fd.attorney,
-          attorney_name: fd.attorneyName,
-          firm: fd.firm,
-          email: fd.email,
-          phone: fd.phone,
-          service_type: checkout.serviceType || checkout.packageName,
-          county: fd.county,
-          respondent_name: fd.respondentName,
-          respondent_address: fd.respondentAddress,
-          additional_addresses: fd.additionalAddresses || [],
-          respondent_employer: fd.respondentEmployer,
-          respondent_employer_address: fd.respondentEmployerAddress,
-          special_instructions: fd.specialInstructions,
-          document_urls: submission.document_urls || [],
-          checkout_id: checkout.sessionId || "",
-          payment_status: isInstant ? "paid" : "pending",
-          payment_method: paymentMethod,
-          payment_received: isInstant,
-          package_name: checkout.packageName || "",
-          package_price: checkout.packagePrice || "",
-          status: "pending",
-          submitted_at: submission.submitted_at || new Date().toISOString(),
-          text_notifications_opt_in: fd.textNotificationsOptIn || false,
-        });
+        // Create one Case record per case block.
+        // Using single create() (not bulk) so the office "New Case Submission Alert"
+        // automation fires for each case (email + SMS to the office).
+        const createdIds = [];
+        for (const c of cases) {
+          const pkg = getPackage(c.packageId);
+          const price = (parseFloat(pkg.price) * addressCount(c)).toFixed(2);
+          const created = await base44.entities.Case.create({
+            case_number: c.caseNumber,
+            attorney: c.plaintiff,
+            attorney_name: clientInfo.attorneyName,
+            firm: clientInfo.firm,
+            email: clientInfo.email,
+            phone: clientInfo.phone,
+            service_type: pkg.serviceType,
+            county: "Salt Lake",
+            respondent_name: c.respondentName,
+            respondent_address: c.respondentAddress,
+            additional_addresses: c.additionalAddresses || [],
+            respondent_employer: c.respondentEmployer,
+            respondent_employer_address: c.respondentEmployerAddress,
+            special_instructions: c.specialInstructions,
+            document_urls: c.document_urls || [],
+            checkout_id: checkout.sessionId || "",
+            payment_status: isInstant ? "paid" : "pending",
+            payment_method: paymentMethod,
+            payment_received: isInstant,
+            package_name: pkg.name,
+            package_price: price,
+            status: "pending",
+            submitted_at: submission.submitted_at || new Date().toISOString(),
+            text_notifications_opt_in: false,
+          });
+          createdIds.push(created.id);
+        }
 
-        // Client confirmation email (sent server-side so external emails are delivered)
-        base44.functions.invoke("sendConfirmationEmail", {
-          to: fd.email,
-          attorney: fd.attorney,
-          caseNumber: fd.caseNumber,
-          caseId: created.id,
-          isInstant,
-          checkout,
-          submission,
-        }).catch(() => {});
+        // One consolidated client confirmation email (sendClientEmail also CCs the office)
+        const lines = cases
+          .map((c, i) => {
+            const pkg = getPackage(c.packageId);
+            const ref = createdIds[i] ? `UPS-${createdIds[i].slice(-8).toUpperCase()}` : "N/A";
+            return `Case ${i + 1} — Ref ${ref}\n  Case #: ${c.caseNumber || "Not provided"}\n  Service: ${pkg.name}\n  Respondent: ${c.respondentName}`;
+          })
+          .join("\n\n");
+
+        const clientName = clientInfo.attorneyName || clientInfo.firm || "Valued Client";
+        const body = `Dear ${clientName},
+
+Your secure document submission has been received by Utah Process Servers and your payment has been ${isInstant ? "processed" : "noted for verification"}.
+
+Cases Submitted (${cases.length}):
+${lines}
+
+${isInstant
+  ? "A member of our team will review your submission and contact you within one business hour to confirm service assignment."
+  : "Your Zelle/Venmo payment is being verified by our team. Once confirmed, your cases will be activated and a coordinator will contact you within one business hour."}
+
+You can check your case status and payment at any time using the Case Lookup page on our website — enter your email address to view all your cases.
+
+For urgent matters, please call us directly at (801) 755-5445.
+
+Utah Process Servers
+Licensed & Bonded in Utah`;
+
+        base44.functions
+          .invoke("sendClientEmail", {
+            to: clientInfo.email,
+            subject: `Submission Confirmed — ${cases.length} Case${cases.length === 1 ? "" : "s"}`,
+            body,
+          })
+          .catch(() => {});
 
         if (cancelled) return;
         setStatus("done");
-        setCaseInfo({
-          caseNumber: fd.caseNumber,
-          serviceType: checkout.serviceType || checkout.packageName,
-          county: fd.county,
-          packagePrice: checkout.packagePrice,
+        setSummary({
+          caseCount: cases.length,
+          total: checkout.packagePrice,
           paymentMethod,
           paymentReceived: isInstant,
         });
 
-        // Clean up the flow storage (keep ups_finalized as a refresh guard)
+        // Clean up flow storage (keep ups_finalized as a refresh guard)
         localStorage.removeItem("ups_submission");
         localStorage.removeItem("ups_checkout");
       } catch (err) {
@@ -108,7 +142,9 @@ export default function ThankYou() {
     };
 
     run();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   if (status === "processing") {
@@ -129,8 +165,12 @@ export default function ThankYou() {
         <Navbar />
         <div className="flex flex-col items-center justify-center min-h-screen px-6 pt-24 text-center">
           <h2 className="font-heading text-2xl font-bold text-foreground mb-3">Something went wrong</h2>
-          <p className="text-muted-foreground mb-6">We couldn't finalize your submission. Please call us at (801) 755-5445 so we can complete your request.</p>
-          <Link to="/"><Button variant="outline">Back to Home</Button></Link>
+          <p className="text-muted-foreground mb-6">
+            We couldn't finalize your submission. Please call us at (801) 755-5445 so we can complete your request.
+          </p>
+          <Link to="/">
+            <Button variant="outline">Back to Home</Button>
+          </Link>
         </div>
       </div>
     );
@@ -142,7 +182,7 @@ export default function ThankYou() {
     zelle: "Zelle",
     venmo: "Venmo",
     other: "Other",
-  }[caseInfo?.paymentMethod] || "—";
+  }[summary?.paymentMethod] || "—";
 
   return (
     <div className="min-h-screen bg-background">
@@ -158,35 +198,29 @@ export default function ThankYou() {
             <CheckCircle className="w-8 h-8 text-green-600" />
           </div>
           <h2 className="font-heading text-3xl font-bold text-foreground mb-4">
-            {caseInfo?.paymentReceived ? "Submission & Payment Confirmed" : "Submission Received"}
+            {summary?.paymentReceived ? "Submission & Payment Confirmed" : "Submission Received"}
           </h2>
           <p className="text-muted-foreground leading-relaxed mb-8">
-            {caseInfo?.paymentReceived
-              ? "Your documents and payment have been securely received by Utah Process Servers. A confirmation has been sent to your email. A coordinator will contact you within one business hour with your case assignment."
-              : "Your documents have been submitted. Your Zelle/Venmo payment is pending verification by our team — once confirmed, your case will be activated and a coordinator will contact you within one business hour."}
+            {summary?.paymentReceived
+              ? `Your documents and payment have been securely received by Utah Process Servers. A confirmation has been sent to your email. A coordinator will contact you within one business hour with your case assignment${summary?.caseCount > 1 ? "s" : ""}.`
+              : "Your documents have been submitted. Your Zelle/Venmo payment is pending verification by our team — once confirmed, your cases will be activated and a coordinator will contact you within one business hour."}
           </p>
 
-          {caseInfo && (
+          {summary && (
             <div className="bg-muted/50 border border-border rounded-xl p-6 text-left mb-8 space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Case Number</span>
-                <span className="font-medium">{caseInfo.caseNumber || "—"}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Service Type</span>
-                <span className="font-medium">{caseInfo.serviceType}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">County</span>
-                <span className="font-medium">{caseInfo.county} County</span>
+                <span className="text-muted-foreground">Cases Submitted</span>
+                <span className="font-medium">{summary.caseCount}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Payment Method</span>
                 <span className="font-medium">{paymentMethodLabel}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Amount</span>
-                <span className="font-medium">${caseInfo.packagePrice ? parseFloat(caseInfo.packagePrice).toFixed(2) : "—"}</span>
+                <span className="text-muted-foreground">Amount Paid</span>
+                <span className="font-medium">
+                  {summary.total ? `$${parseFloat(summary.total).toFixed(2)}` : "—"}
+                </span>
               </div>
             </div>
           )}
