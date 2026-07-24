@@ -67,7 +67,7 @@ const PACKAGES = [
   {
     id: "court_filing",
     name: "Court Filing",
-    price: "75.00",
+    price: "80.00",
     turnaround: "1–2 business days",
     description: "Document filing with Utah state and federal courts",
     serviceType: "Court Filing",
@@ -75,7 +75,7 @@ const PACKAGES = [
   {
     id: "skip_tracing",
     name: "Skip Tracing",
-    price: "59.00",
+    price: "60.00",
     turnaround: "1–3 business days",
     description: "Locate hard-to-find recipients for successful service",
     serviceType: "Skip Tracing",
