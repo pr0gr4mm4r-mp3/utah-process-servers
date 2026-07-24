@@ -65,14 +65,6 @@ const PACKAGES = [
     serviceType: "Subpoena Service",
   },
   {
-    id: "court_filing",
-    name: "Court Filing",
-    price: "75.00",
-    turnaround: "1–2 business days",
-    description: "Document filing with Utah state and federal courts",
-    serviceType: "Court Filing",
-  },
-  {
     id: "skip_tracing",
     name: "Skip Tracing",
     price: "59.00",
