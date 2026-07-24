@@ -49,7 +49,7 @@ export default function HeroSection() {
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
-              <a href="tel:+18015555555" className="w-full sm:w-auto">
+              <a href="tel:+18017555445" className="w-full sm:w-auto">
                 <Button
                   variant="outline"
                   className="w-full border-white/25 text-white hover:bg-white/10 font-medium text-base px-8 py-6 bg-transparent"
