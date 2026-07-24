@@ -56,7 +56,6 @@ export default function Footer() {
                 "Rush & Same-Day Service",
                 "Substitute Service",
                 "Corporate Service",
-                "Court Filings",
                 "Eviction Notices",
                 "Subpoena Service",
               ].map((s) => (
