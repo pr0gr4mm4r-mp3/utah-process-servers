@@ -49,6 +49,11 @@ export default function SecureSubmit() {
     }
   }, []);
 
+  const basePrice = pkg ? parseFloat(pkg.price) : 0;
+  const addressCount = Math.max(1, [formData.respondentAddress, ...additionalAddresses].filter((a) => a && a.trim()).length);
+  const totalPrice = (basePrice * addressCount).toFixed(2);
+  const pricedPkg = pkg ? { ...pkg, price: totalPrice, addressCount, basePrice: basePrice.toFixed(2) } : null;
+
   const handleFileChange = (e) => {
     const selected = Array.from(e.target.files);
     const valid = selected.filter((f) => f.size <= 25 * 1024 * 1024);
@@ -124,7 +129,7 @@ export default function SecureSubmit() {
               </h1>
               {pkg && (
                 <p className="mt-3 text-sm text-[#C4A265] font-medium">
-                  Selected package: {pkg.name} — ${parseFloat(pkg.price).toFixed(2)}
+                  Selected package: {pkg.name} — ${basePrice.toFixed(2)} per address
                 </p>
               )}
               <p className="mt-4 text-white/50 text-base leading-relaxed max-w-xl">
@@ -350,9 +355,17 @@ export default function SecureSubmit() {
             transition={{ duration: 0.5, delay: 0.3 }}
             className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pt-4"
           >
-            <p className="text-xs text-muted-foreground max-w-sm leading-relaxed">
-              By continuing, you confirm all information is accurate. You'll complete payment on the next step.
-            </p>
+            <div className="space-y-1">
+              <p className="text-sm text-foreground font-medium">
+                Total due: ${totalPrice}
+                {addressCount > 1 && (
+                  <span className="text-muted-foreground font-normal"> ({addressCount} addresses × ${basePrice.toFixed(2)} each)</span>
+                )}
+              </p>
+              <p className="text-xs text-muted-foreground max-w-sm leading-relaxed">
+                Each service address is charged at the full package price. You'll complete payment on the next step.
+              </p>
+            </div>
             {saved ? (
               <Button
                 type="button"
@@ -387,8 +400,8 @@ export default function SecureSubmit() {
         </form>
       </div>
 
-      {showPayment && pkg && (
-        <PaymentMethodSelector pkg={pkg} onClose={() => setShowPayment(false)} />
+      {showPayment && pricedPkg && (
+        <PaymentMethodSelector pkg={pricedPkg} onClose={() => setShowPayment(false)} />
       )}
 
       <Footer />

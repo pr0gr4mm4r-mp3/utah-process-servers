@@ -148,6 +148,9 @@ export default function PaymentMethodSelector({ pkg, onClose, existingCase }) {
             <p className="text-xs tracking-[0.15em] uppercase text-primary font-semibold mb-1">Select Payment Method</p>
             <h3 className="font-heading text-xl font-bold text-foreground">{pkg.name}</h3>
             <p className="text-2xl font-bold text-foreground mt-1">${parseFloat(pkg.price).toFixed(2)}</p>
+            {pkg.addressCount > 1 && (
+              <p className="text-xs text-muted-foreground mt-1">{pkg.addressCount} addresses × ${pkg.basePrice} each</p>
+            )}
           </div>
 
           {loadingConfig ? (
