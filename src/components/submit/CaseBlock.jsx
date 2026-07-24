@@ -65,7 +65,7 @@ export default function CaseBlock({ index, data, onChange, onRemove, canRemove }
         <div>
           <label className="text-sm font-medium text-foreground mb-2 block">Service Package *</label>
           <Select value={data.packageId} onValueChange={(v) => set("packageId", v)}>
-            <SelectTrigger className="bg-background">
+            <SelectTrigger className="bg-background" type="button">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
