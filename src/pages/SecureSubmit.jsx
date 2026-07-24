@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Shield, Lock, Upload, FileText, X, ArrowRight, ArrowLeft, Plus, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
@@ -196,17 +195,6 @@ export default function SecureSubmit() {
                 <Input value={formData.caseNumber} onChange={(e) => setFormData({ ...formData, caseNumber: e.target.value })} placeholder="e.g. 2024-CV-001234" className="bg-background" />
               </div>
 
-              <div className="sm:col-span-2 flex items-start gap-3 pt-2">
-                <Checkbox
-                  id="text-opt-in"
-                  checked={formData.textNotificationsOptIn}
-                  onCheckedChange={(v) => setFormData({ ...formData, textNotificationsOptIn: !!v })}
-                  className="mt-1"
-                />
-                <label htmlFor="text-opt-in" className="text-sm text-muted-foreground leading-relaxed cursor-pointer">
-                  Yes, send me text message notifications about my case status (service attempts and completion). Standard messaging rates may apply.
-                </label>
-              </div>
             </div>
           </motion.div>
 
