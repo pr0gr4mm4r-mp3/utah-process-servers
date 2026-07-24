@@ -78,7 +78,6 @@ const FEATURED_IDS = ["standard", "rush", "same_day"];
 
 export default function PackageSelection() {
   const featured = PACKAGES.filter(p => FEATURED_IDS.includes(p.id));
-  const additional = PACKAGES.filter(p => !FEATURED_IDS.includes(p.id));
 
   const handleSelect = (pkg) => {
     // Pricing-first flow: save the selected package, then submit documents
@@ -152,39 +151,7 @@ export default function PackageSelection() {
           ))}
         </div>
 
-        {/* Additional services */}
-        <div>
-          <h3 className="font-heading text-xl font-semibold text-foreground mb-6 text-center">Additional Services</h3>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {additional.map((pkg, i) => (
-              <motion.div
-                key={pkg.id}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 + i * 0.05 }}
-                className="border border-border rounded-xl bg-white p-6 flex items-center justify-between gap-4"
-              >
-                <div className="min-w-0">
-                  <h4 className="font-medium text-foreground">{pkg.name}</h4>
-                  <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-                    <Clock className="w-3 h-3" /> {pkg.turnaround}
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1 truncate">{pkg.description}</p>
-                </div>
-                <div className="flex items-center gap-3 flex-shrink-0">
-                  <span className="font-bold text-lg text-foreground">${parseInt(pkg.price)}</span>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleSelect(pkg)}
-                  >
-                    Select
-                  </Button>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
+
       </div>
 
     </div>
