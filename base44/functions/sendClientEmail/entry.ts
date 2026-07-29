@@ -1,5 +1,4 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
-import nodemailer from 'npm:nodemailer@6.9.13';
 
 const OFFICE_EMAIL = "utahproservers@yahoo.com";
 
@@ -35,31 +34,46 @@ Deno.serve(async (req) => {
     if (to === OFFICE_EMAIL) {
       result.client = result.office;
     } else {
-      const smtpUser = Deno.env.get("GMAIL_SMTP_USER");
-      const smtpPass = Deno.env.get("GMAIL_APP_PASSWORD");
-      if (!smtpUser || !smtpPass) {
-        result.clientError = "Gmail SMTP credentials not configured";
-        console.error("sendClientEmail: GMAIL_SMTP_USER / GMAIL_APP_PASSWORD not set");
-      } else {
-        console.log("sendClientEmail: authenticating as", smtpUser, "pass length", smtpPass.length);
-        try {
-          const transporter = nodemailer.createTransport({
-            host: "smtp.gmail.com",
-            port: 465,
-            secure: true,
-            auth: { user: smtpUser, pass: smtpPass },
-          });
-          await transporter.sendMail({
-            from: `"Utah Process Servers" <${smtpUser}>`,
-            to,
-            subject,
-            text: body,
-          });
-          result.client = true;
-        } catch (err) {
-          result.clientError = err.message;
-          console.error("sendClientEmail: client email via Gmail SMTP failed:", err.message);
+      try {
+        const { accessToken } = await base44.asServiceRole.connectors.getConnection("gmail");
+        if (!accessToken) {
+          throw new Error("Gmail OAuth access token not available");
         }
+
+        // Build a minimal RFC 2822 message (ASCII-only headers/body here).
+        const rawMessage =
+          `From: "Utah Process Servers" <contact@utahproservers.com>\r\n` +
+          `To: ${to}\r\n` +
+          `Subject: ${subject}\r\n` +
+          `Content-Type: text/plain; charset=utf-8\r\n` +
+          `MIME-Version: 1.0\r\n` +
+          `\r\n` +
+          `${body}`;
+
+        // base64url-encode the UTF-8 bytes for the Gmail API.
+        const bytes = new TextEncoder().encode(rawMessage);
+        let bin = "";
+        for (const b of bytes) bin += String.fromCharCode(b);
+        const encoded = btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+
+        const res = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ raw: encoded }),
+        });
+
+        if (!res.ok) {
+          const errText = await res.text();
+          throw new Error(`Gmail API ${res.status}: ${errText}`);
+        }
+
+        result.client = true;
+      } catch (err) {
+        result.clientError = err.message;
+        console.error("sendClientEmail: client email via Gmail API failed:", err.message);
       }
     }
 
