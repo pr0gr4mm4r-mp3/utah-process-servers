@@ -41,6 +41,7 @@ Deno.serve(async (req) => {
         result.clientError = "Gmail SMTP credentials not configured";
         console.error("sendClientEmail: GMAIL_SMTP_USER / GMAIL_APP_PASSWORD not set");
       } else {
+        console.log("sendClientEmail: authenticating as", smtpUser, "pass length", smtpPass.length);
         try {
           const transporter = nodemailer.createTransport({
             host: "smtp.gmail.com",
