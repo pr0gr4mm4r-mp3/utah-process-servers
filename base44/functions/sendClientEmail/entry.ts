@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+import nodemailer from 'npm:nodemailer@6.9.13';
 
 const OFFICE_EMAIL = "utahproservers@yahoo.com";
 
@@ -13,11 +14,9 @@ Deno.serve(async (req) => {
 
     const result = { office: false, client: false, clientError: null as string | null };
 
-    // 1) Office copy FIRST.
-    //    The built-in SendEmail integration only delivers to registered app
-    //    users. The office inbox is registered, so this always succeeds. Sending
-    //    it first guarantees the office keeps its record even when the client
-    //    email (below) fails.
+    // 1) Office copy via the built-in SendEmail integration.
+    //    The office inbox is a registered app user, so this always succeeds and
+    //    keeps the office record even if the client send below fails.
     try {
       await base44.asServiceRole.integrations.Core.SendEmail({
         to: OFFICE_EMAIL,
@@ -29,19 +28,37 @@ Deno.serve(async (req) => {
       console.error("sendClientEmail: office copy failed:", err.message);
     }
 
-    // 2) Client email.
-    //    External recipients (the submitting attorney/client) are rejected by
-    //    the built-in integration. We attempt it separately and never let a
-    //    failure here block or undo the office copy above.
+    // 2) Client email via Gmail SMTP.
+    //    The built-in integration only reaches registered app users, so external
+    //    clients are sent through the connected Google Workspace Gmail account,
+    //    which can deliver to any address and sends from your own domain.
     if (to === OFFICE_EMAIL) {
       result.client = result.office;
     } else {
-      try {
-        await base44.asServiceRole.integrations.Core.SendEmail({ to, subject, body });
-        result.client = true;
-      } catch (err) {
-        result.clientError = err.message;
-        console.error("sendClientEmail: client email failed:", err.message);
+      const smtpUser = Deno.env.get("GMAIL_SMTP_USER");
+      const smtpPass = Deno.env.get("GMAIL_APP_PASSWORD");
+      if (!smtpUser || !smtpPass) {
+        result.clientError = "Gmail SMTP credentials not configured";
+        console.error("sendClientEmail: GMAIL_SMTP_USER / GMAIL_APP_PASSWORD not set");
+      } else {
+        try {
+          const transporter = nodemailer.createTransport({
+            host: "smtp.gmail.com",
+            port: 465,
+            secure: true,
+            auth: { user: smtpUser, pass: smtpPass },
+          });
+          await transporter.sendMail({
+            from: `"Utah Process Servers" <${smtpUser}>`,
+            to,
+            subject,
+            text: body,
+          });
+          result.client = true;
+        } catch (err) {
+          result.clientError = err.message;
+          console.error("sendClientEmail: client email via Gmail SMTP failed:", err.message);
+        }
       }
     }
 
