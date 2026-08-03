@@ -2,7 +2,6 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Shield, Clock, MapPin } from "lucide-react";
-import { Link } from "react-router-dom";
 
 export default function HeroSection() {
   return (
@@ -43,12 +42,12 @@ export default function HeroSection() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 mt-10">
-              <Link to="/pricing" className="w-full sm:w-auto">
+              <a href="#pricing" className="w-full sm:w-auto">
                 <Button className="w-full bg-[#C4A265] text-[#1A1C1E] hover:bg-[#C4A265]/90 font-semibold text-base px-8 py-6 tracking-wide">
                   Request Service
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
-              </Link>
+              </a>
               <a href="tel:+18017555445" className="w-full sm:w-auto">
                 <Button
                   variant="outline"
@@ -105,12 +104,12 @@ export default function HeroSection() {
                 ))}
               </div>
 
-              <Link to="/pricing" className="block mt-6">
+              <a href="#pricing" className="block mt-6">
                 <Button className="w-full bg-white text-[#1A1C1E] hover:bg-white/90 font-semibold py-5">
                   Start Your Service Request
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
-              </Link>
+              </a>
             </div>
           </motion.div>
         </div>
