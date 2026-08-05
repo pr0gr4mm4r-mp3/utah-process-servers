@@ -20,7 +20,7 @@ export default function Pricing() {
 
       <div className="max-w-4xl mx-auto px-6 lg:px-12 pb-10">
         <p className="text-xs text-muted-foreground text-center leading-relaxed">
-          <strong>Payment Processing Fee Disclosure:</strong> A 3.5% convenience fee will be added to all credit and debit card transactions. This fee is charged by our payment processor and is not retained by Utah Process Servers. To avoid this fee, payment may be made via Zelle or Venmo at no additional charge.
+          <strong>Payment Processing Fee Disclosure:</strong> A 3.5% card processing fee is included in all displayed prices, reflecting the cost of credit and debit card transactions. This fee is charged by our payment processor and is not retained by Utah Process Servers.
         </p>
       </div>
 
