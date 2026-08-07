@@ -2,7 +2,7 @@ export const PACKAGES = [
   {
     id: "standard",
     name: "Standard Service",
-    price: "82.80",
+    price: "80.00",
     turnaround: "Up to 3 days",
     description: "Three documented service attempts over three consecutive days, with certified proof of service upon completion.",
     features: ["Three attempts over three days", "Certified proof of service", "Email confirmation"],
@@ -11,7 +11,7 @@ export const PACKAGES = [
   {
     id: "rush",
     name: "Rush Service",
-    price: "124.20",
+    price: "120.00",
     turnaround: "24 hours",
     description: "Priority handling for time-sensitive legal deadlines",
     features: ["24-hour turnaround", "Real-time status updates", "Priority server assignment"],
@@ -21,7 +21,7 @@ export const PACKAGES = [
   {
     id: "same_day",
     name: "Same-Day Service",
-    price: "165.60",
+    price: "160.00",
     turnaround: "Same day",
     description: "Urgent same-day service for critical filings",
     features: ["Same-day completion", "Dedicated process server", "Immediate confirmation"],
@@ -30,7 +30,7 @@ export const PACKAGES = [
   {
     id: "substitute",
     name: "Substitute Service",
-    price: "98.33",
+    price: "95.00",
     turnaround: "3–5 business days",
     description: "Court-authorized alternative service methods",
     serviceType: "Substitute Service",
@@ -38,7 +38,7 @@ export const PACKAGES = [
   {
     id: "corporate",
     name: "Corporate Service",
-    price: "113.85",
+    price: "110.00",
     turnaround: "3–5 business days",
     description: "Service on registered agents and corporate entities",
     serviceType: "Corporate Service",
@@ -46,7 +46,7 @@ export const PACKAGES = [
   {
     id: "eviction",
     name: "Eviction Notice",
-    price: "98.33",
+    price: "95.00",
     turnaround: "24–48 hours",
     description: "Eviction and unlawful detainer notice delivery",
     serviceType: "Eviction Notice",
@@ -54,7 +54,7 @@ export const PACKAGES = [
   {
     id: "subpoena",
     name: "Subpoena Service",
-    price: "98.33",
+    price: "95.00",
     turnaround: "3–5 business days",
     description: "Civil and criminal subpoena service statewide",
     serviceType: "Subpoena Service",
@@ -62,7 +62,7 @@ export const PACKAGES = [
   {
     id: "skip_tracing",
     name: "Skip Tracing",
-    price: "61.07",
+    price: "59.00",
     turnaround: "1–3 business days",
     description: "Locate hard-to-find recipients for successful service",
     serviceType: "Skip Tracing",

@@ -20,6 +20,10 @@ export default function PaymentMethodSelector({ pkg, onClose, existingCase }) {
   const [paypalError, setPaypalError] = useState(null);
   const [paypalRetryKey, setPaypalRetryKey] = useState(0);
 
+  const basePrice = parseFloat(pkg.price) || 0;
+  const processingFee = basePrice * 0.035;
+  const totalPrice = (basePrice + processingFee).toFixed(2);
+
   useEffect(() => {
     base44.functions.invoke("getPaymentConfig").then((res) => {
       setConfig(res.data || {});
@@ -57,7 +61,7 @@ export default function PaymentMethodSelector({ pkg, onClose, existingCase }) {
         return actions.order.create({
           purchase_units: [{
             description: pkg.name,
-            amount: { currency_code: "USD", value: pkg.price },
+            amount: { currency_code: "USD", value: totalPrice },
           }],
         });
       },
@@ -84,7 +88,7 @@ export default function PaymentMethodSelector({ pkg, onClose, existingCase }) {
                 localStorage.setItem("ups_checkout", JSON.stringify({
                   sessionId: data.orderID,
                   packageName: pkg.name,
-                  packagePrice: pkg.price,
+                  packagePrice: totalPrice,
                   serviceType: pkg.serviceType,
                   paymentMethod: "paypal",
                 }));
@@ -114,7 +118,7 @@ export default function PaymentMethodSelector({ pkg, onClose, existingCase }) {
     const params = new URLSearchParams({
       method,
       packageName: pkg.name,
-      packagePrice: pkg.price,
+      packagePrice: totalPrice,
       serviceType: pkg.serviceType,
     });
     if (existingCase) {
@@ -147,7 +151,11 @@ export default function PaymentMethodSelector({ pkg, onClose, existingCase }) {
           <div className="mb-6">
             <p className="text-xs tracking-[0.15em] uppercase text-primary font-semibold mb-1">Select Payment Method</p>
             <h3 className="font-heading text-xl font-bold text-foreground">{pkg.name}</h3>
-            <p className="text-2xl font-bold text-foreground mt-1">${parseFloat(pkg.price).toFixed(2)}</p>
+            <div className="mt-1 space-y-0.5">
+              <p className="text-sm text-muted-foreground">Subtotal: ${basePrice.toFixed(2)}</p>
+              <p className="text-sm text-muted-foreground">Processing fee (3.5%): ${processingFee.toFixed(2)}</p>
+              <p className="text-2xl font-bold text-foreground pt-1">Total: ${totalPrice}</p>
+            </div>
             {pkg.addressCount > 1 && (
               <p className="text-xs text-muted-foreground mt-1">{pkg.addressCount} addresses × ${pkg.basePrice} each</p>
             )}

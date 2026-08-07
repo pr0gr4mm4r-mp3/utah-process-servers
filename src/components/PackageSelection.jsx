@@ -57,10 +57,11 @@ export default function PackageSelection() {
                 <Clock className="w-3.5 h-3.5" />
                 {pkg.turnaround}
               </div>
-              <div className="flex items-baseline gap-1 mb-4">
+              <div className="flex items-baseline gap-1 mb-1">
                 <span className="text-4xl font-bold text-foreground">${parseInt(pkg.price)}</span>
                 <span className="text-muted-foreground text-sm">.{pkg.price.split(".")[1]}</span>
               </div>
+              <p className="text-xs text-muted-foreground mb-4">+ 3.5% processing fee added at checkout</p>
               <p className="text-sm text-muted-foreground mb-6">{pkg.description}</p>
               <ul className="space-y-3 mb-8 flex-1">
                 {pkg.features.map((f) => (
