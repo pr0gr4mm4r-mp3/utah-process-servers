@@ -78,11 +78,11 @@ export default function Navbar() {
             </div>
 
             <div className="hidden lg:flex items-center gap-4">
-              <Link to="/pricing">
+              <a href="#pricing">
                 <Button className="bg-primary text-primary-foreground hover:bg-primary/90 font-medium tracking-wide text-sm px-6">
-                  Get Started
+                  Check Pricing
                 </Button>
-              </Link>
+              </a>
             </div>
 
             <button
@@ -143,11 +143,11 @@ export default function Navbar() {
                   </a>
                 )
               )}
-              <Link to="/pricing" onClick={() => setMobileOpen(false)} className="w-full mt-4">
+              <a href="#pricing" onClick={() => setMobileOpen(false)} className="w-full mt-4">
                 <Button className="w-full bg-primary text-primary-foreground text-lg py-6">
-                  Get Started
+                  Check Pricing
                 </Button>
-              </Link>
+              </a>
 
             </div>
           </motion.div>

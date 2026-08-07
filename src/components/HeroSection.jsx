@@ -106,7 +106,7 @@ export default function HeroSection() {
 
               <a href="#pricing" className="block mt-6">
                 <Button className="w-full bg-white text-[#1A1C1E] hover:bg-white/90 font-semibold py-5">
-                  Start Your Service Request
+                  View Pricing
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </a>
