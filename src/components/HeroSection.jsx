@@ -44,7 +44,7 @@ export default function HeroSection() {
             <div className="flex flex-col sm:flex-row gap-4 mt-10">
               <a href="#pricing" className="w-full sm:w-auto">
                 <Button className="w-full bg-[#C4A265] text-[#1A1C1E] hover:bg-[#C4A265]/90 font-semibold text-base px-8 py-6 tracking-wide">
-                  Request Service
+                  Check Pricing
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </a>
