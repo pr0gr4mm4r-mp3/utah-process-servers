@@ -66,6 +66,11 @@
           "address": {
             "type": "string",
             "description": "Address for this additional respondent"
+          },
+          "attempts": {
+            "type": "integer",
+            "default": 0,
+            "description": "Number of service attempts made for this respondent"
           }
         }
       },
@@ -142,7 +147,7 @@
     "service_attempts": {
       "type": "integer",
       "default": 0,
-      "description": "Number of service attempts made (for Standard Service cases)"
+      "description": "Number of service attempts made (for the primary respondent)"
     },
     "submitted_at": {
       "type": "string",

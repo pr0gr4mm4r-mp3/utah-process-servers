@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, FileText, Download, Printer, Save, Trash2, CreditCard, DollarSign, Target, History } from "lucide-react";
+import { X, FileText, Download, Printer, Save, Trash2, CreditCard, DollarSign, History } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -14,6 +14,7 @@ import {
 import { format } from "date-fns";
 import { toast } from "sonner";
 import CaseHistoryLog from "@/components/admin/CaseHistoryLog";
+import RespondentAttemptSection from "@/components/admin/RespondentAttemptSection";
 
 const STATUS_STYLES = {
   pending: "bg-yellow-50 text-yellow-700",
@@ -31,9 +32,6 @@ const PAYMENT_METHOD_LABELS = {
   other: "Other",
 };
 
-const isStandardCase = (serviceType) =>
-  serviceType?.toLowerCase().includes("standard");
-
 export default function CaseDetailModal({ caseData, onClose, onUpdate }) {
   const [status, setStatus] = useState(caseData.status || "pending");
   const [notes, setNotes] = useState(caseData.notes || "");
@@ -41,10 +39,8 @@ export default function CaseDetailModal({ caseData, onClose, onUpdate }) {
     caseData.delivered_at ? caseData.delivered_at.slice(0, 16) : ""
   );
   const [paymentReceived, setPaymentReceived] = useState(caseData.payment_received || false);
-  const [serviceAttempts, setServiceAttempts] = useState(caseData.service_attempts || 0);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [recordingAttempt, setRecordingAttempt] = useState(false);
   const [activeTab, setActiveTab] = useState("details");
   const [logKey, setLogKey] = useState(0); // used to re-render CaseHistoryLog
 
@@ -137,86 +133,6 @@ Licensed & Bonded in Utah`.trim(),
 
     onUpdate(updated);
     setSaving(false);
-  };
-
-  const handleRecordAttempt = async (attemptNumber) => {
-    if (recordingAttempt) return;
-    setRecordingAttempt(true);
-    try {
-      const updated = await base44.entities.Case.update(caseData.id, {
-        service_attempts: attemptNumber,
-      });
-
-      await base44.entities.StatusLog.create({
-        case_id: caseData.id,
-        event_type: "attempt",
-        attempt_number: attemptNumber,
-      });
-
-      // Email client
-      if (caseData.email) {
-        await base44.functions.invoke("sendClientEmail", {
-          to: caseData.email,
-          subject: `Service Update — Attempt #${attemptNumber} on Your Case`,
-          body: `Dear ${caseData.attorney || "Valued Client"},
-
-This is a courtesy notification from Utah Process Servers.
-
-We have made Service Attempt #${attemptNumber} of 3 to serve your legal documents on the respondent.
-
-Case Details:
-- Case Number: ${caseData.case_number || "N/A"}
-- Respondent: ${caseData.respondent_name}
-- Respondent Address: ${caseData.respondent_address || "On file"}
-
-${attemptNumber < 3
-  ? `We will make another attempt as part of your Standard Service package.`
-  : `This was our final included attempt. Please contact us to discuss next steps if service was unsuccessful.`}
-
-For questions, call (801) 755-5445 or email utahproservers@yahoo.com.
-
-Utah Process Servers
-Licensed & Bonded in Utah`.trim(),
-        });
-      }
-
-      setServiceAttempts(attemptNumber);
-      setLogKey((k) => k + 1);
-      onUpdate({ ...caseData, service_attempts: attemptNumber });
-      toast.success(`Attempt #${attemptNumber} recorded — client notified`);
-    } catch {
-      toast.error("Failed to record attempt. Please try again.");
-    } finally {
-      setRecordingAttempt(false);
-    }
-  };
-
-  const handleRemoveAttempt = async () => {
-    if (recordingAttempt || serviceAttempts === 0) return;
-    setRecordingAttempt(true);
-    try {
-      const removedAttempt = serviceAttempts;
-      const newAttempts = serviceAttempts - 1;
-      await base44.entities.Case.update(caseData.id, {
-        service_attempts: newAttempts,
-      });
-
-      await base44.entities.StatusLog.create({
-        case_id: caseData.id,
-        event_type: "attempt",
-        attempt_number: removedAttempt,
-        note: "Attempt removed (deselected by admin)",
-      });
-
-      setServiceAttempts(newAttempts);
-      setLogKey((k) => k + 1);
-      onUpdate({ ...caseData, service_attempts: newAttempts });
-      toast.success(`Attempt #${removedAttempt} removed`);
-    } catch {
-      toast.error("Failed to remove attempt. Please try again.");
-    } finally {
-      setRecordingAttempt(false);
-    }
   };
 
   const submittedDate = caseData.submitted_at || caseData.created_date;
@@ -334,58 +250,38 @@ Licensed & Bonded in Utah`.trim(),
                   )}
                 </div>
 
-                {/* Service Attempts — Standard cases only */}
-                {isStandardCase(caseData.service_type) && (
-                  <div>
-                    <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold mb-3">
-                      Service Attempts
-                    </p>
-                    <div className="bg-muted/30 border border-border rounded-xl p-4">
-                      <p className="text-xs text-muted-foreground mb-3">
-                        Standard Service includes up to 3 attempts. Client receives an email notification for each attempt recorded. Click the most recent attempt again to remove it if pressed by mistake.
-                      </p>
-                      <div className="flex items-center gap-3">
-                        {[1, 2, 3].map((n) => (
-                          <button
-                            key={n}
-                            title={n === serviceAttempts ? `Click to remove Attempt #${n}` : undefined}
-                            onClick={() => {
-                              if (recordingAttempt) return;
-                              if (n === serviceAttempts) {
-                                if (window.confirm(`Remove Service Attempt #${n}? This will decrement the attempt count.`)) {
-                                  handleRemoveAttempt();
-                                }
-                                return;
-                              }
-                              if (serviceAttempts < n) {
-                                if (window.confirm(`Confirm recording Service Attempt #${n}? This will notify the client and cannot be undone.`)) {
-                                  handleRecordAttempt(n);
-                                }
-                              }
-                            }}
-                            disabled={recordingAttempt || n < serviceAttempts}
-                            className={`flex flex-col items-center justify-center w-16 h-16 rounded-xl border-2 text-sm font-bold transition-all ${
-                              serviceAttempts >= n
-                                ? n === serviceAttempts
-                                  ? "border-primary bg-primary/10 text-primary hover:border-destructive/50 hover:bg-destructive/5 hover:text-destructive"
-                                  : "border-primary bg-primary/10 text-primary"
-                                : "border-border text-muted-foreground hover:border-primary/50 hover:text-primary"
-                            } disabled:opacity-50 disabled:cursor-not-allowed`}
-                          >
-                            <Target className={`w-4 h-4 mb-1 ${serviceAttempts >= n ? "text-primary" : "text-muted-foreground"}`} />
-                            #{n}
-                          </button>
-                        ))}
-                        <div className="ml-2 text-sm text-muted-foreground">
-                          {serviceAttempts === 0 && "No attempts recorded"}
-                          {serviceAttempts === 1 && "1 of 3 attempts made"}
-                          {serviceAttempts === 2 && "2 of 3 attempts made"}
-                          {serviceAttempts === 3 && "All 3 attempts completed"}
-                        </div>
-                      </div>
-                    </div>
+                {/* Service Attempts — per respondent */}
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground font-semibold mb-3">
+                    Service Attempts
+                  </p>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Each respondent is tracked individually. The client receives an email notification for each attempt recorded.
+                  </p>
+                  <div className="space-y-3">
+                    <RespondentAttemptSection
+                      caseData={caseData}
+                      respondentIndex={-1}
+                      respondentName={caseData.respondent_name}
+                      respondentAddress={caseData.respondent_address}
+                      attempts={caseData.service_attempts || 0}
+                      onUpdate={onUpdate}
+                      onLogChange={() => setLogKey((k) => k + 1)}
+                    />
+                    {(caseData.additional_respondents || []).map((r, i) => (
+                      <RespondentAttemptSection
+                        key={i}
+                        caseData={caseData}
+                        respondentIndex={i}
+                        respondentName={r.name}
+                        respondentAddress={r.address}
+                        attempts={r.attempts || 0}
+                        onUpdate={onUpdate}
+                        onLogChange={() => setLogKey((k) => k + 1)}
+                      />
+                    ))}
                   </div>
-                )}
+                </div>
 
                 {/* Dates */}
                 <div>

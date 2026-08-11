@@ -22,6 +22,10 @@
       "type": "integer",
       "description": "Attempt number (for attempt events)"
     },
+    "respondent_name": {
+      "type": "string",
+      "description": "Name of the respondent this log entry pertains to (for per-respondent attempt tracking)"
+    },
     "note": {
       "type": "string",
       "description": "Optional note for this log entry"

@@ -50,7 +50,7 @@ export default function CaseHistoryLog({ caseId }) {
           <div className="flex-1 min-w-0">
             {log.event_type === "attempt" ? (
               <p className="font-medium text-foreground">
-                Attempt #{log.attempt_number} — Service attempted
+                Attempt #{log.attempt_number} — Service attempted{log.respondent_name ? ` on ${log.respondent_name}` : ""}
               </p>
             ) : (
               <p className="font-medium text-foreground">
