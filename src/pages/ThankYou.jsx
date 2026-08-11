@@ -58,7 +58,7 @@ export default function ThankYou() {
                 // Different respondent on the same case — add to additional_respondents
                 const addr = [c.respondentAddress, ...(c.additionalAddresses || [])]
                   .filter((a) => a && a.trim()).join("; ");
-                existing.additionalRespondents.push({ name: c.respondentName || "", address: addr });
+                existing.additionalRespondents.push({ name: c.respondentName || "", address: addr, attempts: 0 });
               }
               existing.document_urls = [...existing.document_urls, ...(c.document_urls || [])];
               if (c.specialInstructions && c.specialInstructions.trim()) {
