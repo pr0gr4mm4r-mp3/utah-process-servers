@@ -54,6 +54,23 @@
       },
       "description": "Additional known addresses for the respondent"
     },
+    "additional_respondents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the additional respondent or defendant"
+          },
+          "address": {
+            "type": "string",
+            "description": "Address for this additional respondent"
+          }
+        }
+      },
+      "description": "Additional respondents or defendants on the same case file"
+    },
     "respondent_employer": {
       "type": "string",
       "description": "Respondent employer or company name"

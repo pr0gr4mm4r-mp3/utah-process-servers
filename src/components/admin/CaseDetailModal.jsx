@@ -304,6 +304,28 @@ Licensed & Bonded in Utah`.trim(),
                       </div>
                     ))}
                   </div>
+                  {caseData.additional_addresses?.length > 0 && (
+                    <div className="mt-3">
+                      <p className="text-muted-foreground text-xs mb-0.5">Additional Addresses</p>
+                      <div className="space-y-1">
+                        {caseData.additional_addresses.map((addr, i) => (
+                          <p key={i} className="text-sm font-medium text-foreground">{addr}</p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {caseData.additional_respondents?.length > 0 && (
+                    <div className="mt-3">
+                      <p className="text-muted-foreground text-xs mb-0.5">Additional Respondents</p>
+                      <div className="space-y-1">
+                        {caseData.additional_respondents.map((r, i) => (
+                          <p key={i} className="text-sm font-medium text-foreground">
+                            {r.name} <span className="text-muted-foreground font-normal">— {r.address || "—"}</span>
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   {caseData.special_instructions && (
                     <div className="mt-3">
                       <p className="text-muted-foreground text-xs mb-0.5">Special Instructions</p>

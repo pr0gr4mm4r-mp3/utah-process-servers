@@ -31,7 +31,54 @@ export default function ThankYou() {
         const submission = JSON.parse(submissionRaw);
         const checkout = JSON.parse(checkoutRaw);
         const clientInfo = submission.clientInfo || {};
-        const cases = submission.cases || [];
+        let cases = submission.cases || [];
+
+        // Consolidate case blocks into a single Case record per case file.
+        // Group by case_number when available; otherwise by respondent name.
+        // Same respondent → merge addresses. Different respondent (same case #) → merge into additional_respondents.
+        {
+          const consolidated = [];
+          const groupMap = new Map();
+          for (const c of cases) {
+            const caseKey = (c.caseNumber || "").trim().toLowerCase();
+            const respondentKey = (c.respondentName || "").trim().toLowerCase();
+            const key = caseKey || respondentKey;
+            if (!key) { consolidated.push({ ...c, additionalRespondents: [] }); continue; }
+            if (groupMap.has(key)) {
+              const existing = groupMap.get(key);
+              if (respondentKey && respondentKey === (existing.respondentName || "").trim().toLowerCase()) {
+                // Same respondent — merge addresses
+                if (c.respondentAddress && c.respondentAddress.trim()) {
+                  existing.additionalAddresses.push(c.respondentAddress.trim());
+                }
+                for (const a of c.additionalAddresses || []) {
+                  if (a && a.trim()) existing.additionalAddresses.push(a.trim());
+                }
+              } else {
+                // Different respondent on the same case — add to additional_respondents
+                const addr = [c.respondentAddress, ...(c.additionalAddresses || [])]
+                  .filter((a) => a && a.trim()).join("; ");
+                existing.additionalRespondents.push({ name: c.respondentName || "", address: addr });
+              }
+              existing.document_urls = [...existing.document_urls, ...(c.document_urls || [])];
+              if (c.specialInstructions && c.specialInstructions.trim()) {
+                existing.specialInstructions = [existing.specialInstructions, c.specialInstructions]
+                  .filter(Boolean).join("\n---\n");
+              }
+              if (!existing.caseNumber && c.caseNumber) existing.caseNumber = c.caseNumber;
+            } else {
+              const entry = {
+                ...c,
+                additionalAddresses: (c.additionalAddresses || []).filter((a) => a && a.trim()),
+                additionalRespondents: [],
+                document_urls: [...(c.document_urls || [])],
+              };
+              groupMap.set(key, entry);
+              consolidated.push(entry);
+            }
+          }
+          cases = consolidated;
+        }
 
         const paymentMethod = checkout.paymentMethod || "other";
         const isInstant = paymentMethod === "paypal" || paymentMethod === "stripe";
@@ -69,6 +116,7 @@ export default function ThankYou() {
             respondent_name: c.respondentName,
             respondent_address: c.respondentAddress,
             additional_addresses: c.additionalAddresses || [],
+            additional_respondents: c.additionalRespondents || [],
             respondent_employer: c.respondentEmployer,
             respondent_employer_address: c.respondentEmployerAddress,
             special_instructions: c.specialInstructions,
@@ -91,7 +139,8 @@ export default function ThankYou() {
           .map((c, i) => {
             const pkg = getPackage(c.packageId);
             const ref = createdIds[i] ? `UPS-${createdIds[i].slice(-8).toUpperCase()}` : "N/A";
-            return `Case ${i + 1} — Ref ${ref}\n  Case #: ${c.caseNumber || "Not provided"}\n  Service: ${pkg.name}\n  Respondent: ${c.respondentName}`;
+            const respNames = [c.respondentName, ...(c.additionalRespondents || []).map((r) => r.name)].filter(Boolean);
+            return `Case ${i + 1} — Ref ${ref}\n  Case #: ${c.caseNumber || "Not provided"}\n  Service: ${pkg.name}\n  Respondent${respNames.length > 1 ? "s" : ""}: ${respNames.join(", ")}`;
           })
           .join("\n\n");
 

@@ -38,7 +38,12 @@ export default function CaseRow({ caseData: c, onClick }) {
       </span>
       <div className="min-w-0">
         <p className="text-sm font-medium text-foreground truncate">{c.attorney}</p>
-        <p className="text-xs text-muted-foreground truncate">{c.respondent_name}</p>
+        <p className="text-xs text-muted-foreground truncate">
+          {c.respondent_name}
+          {c.additional_respondents?.length > 0 && (
+            <span className="text-primary/70"> +{c.additional_respondents.length} more</span>
+          )}
+        </p>
       </div>
       <span className="text-sm text-foreground truncate">{c.service_type}</span>
       <span>
