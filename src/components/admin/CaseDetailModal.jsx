@@ -15,6 +15,7 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 import CaseHistoryLog from "@/components/admin/CaseHistoryLog";
 import RespondentAttemptSection from "@/components/admin/RespondentAttemptSection";
+import { calculateCaseTotal, chargeableUnits, getUnitPrice } from "@/lib/caseUtils";
 
 const STATUS_STYLES = {
   pending: "bg-yellow-50 text-yellow-700",
@@ -359,10 +360,14 @@ Licensed & Bonded in Utah`.trim(),
                       </div>
                     </div>
                     <div>
-                      <p className="text-muted-foreground text-xs mb-0.5">Amount</p>
+                      <p className="text-muted-foreground text-xs mb-0.5">Total Charged</p>
                       <p className="font-medium text-foreground">
-                        {caseData.package_price ? `$${parseFloat(caseData.package_price).toFixed(2)}` : "—"}
-                        {caseData.package_name ? <span className="text-muted-foreground text-xs ml-1">({caseData.package_name})</span> : null}
+                        ${calculateCaseTotal(caseData).toFixed(2)}
+                        {caseData.package_name && (
+                          <span className="text-muted-foreground text-xs ml-1">
+                            ({caseData.package_name} × {chargeableUnits(caseData)} @ ${getUnitPrice(caseData).toFixed(0)})
+                          </span>
+                        )}
                       </p>
                     </div>
                   </div>

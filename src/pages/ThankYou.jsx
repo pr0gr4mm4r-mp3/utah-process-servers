@@ -8,8 +8,11 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { getPackage } from "@/lib/packages";
 
-const addressCount = (c) =>
-  Math.max(1, [c.respondentAddress, ...(c.additionalAddresses || [])].filter((a) => a && a.trim()).length);
+const addressCount = (c) => {
+  const primary = [c.respondentAddress, ...(c.additionalAddresses || [])].filter((a) => a && a.trim()).length;
+  const additional = (c.additionalRespondents || []).length;
+  return Math.max(1, primary) + additional;
+};
 
 export default function ThankYou() {
   const [status, setStatus] = useState("processing"); // processing | done | error

@@ -1,6 +1,7 @@
 import React from "react";
 import { ChevronRight, FileText, DollarSign } from "lucide-react";
 import { format } from "date-fns";
+import { calculateCaseTotal } from "@/lib/caseUtils";
 
 const STATUS_STYLES = {
   pending: "bg-yellow-50 text-yellow-700 border-yellow-200",
@@ -52,12 +53,12 @@ export default function CaseRow({ caseData: c, onClick }) {
         </span>
       </span>
       <div className="flex flex-col gap-1">
+        <span className="text-sm font-semibold text-foreground">
+          ${calculateCaseTotal(c).toFixed(2)}
+        </span>
         <span className="text-xs text-muted-foreground">
           {c.payment_method ? paymentMethodLabel[c.payment_method] || c.payment_method : "—"}
-        </span>
-        <span className={`inline-flex items-center gap-1 text-xs font-medium ${c.payment_received ? "text-green-600" : "text-yellow-600"}`}>
-          <DollarSign className="w-3 h-3" />
-          {c.payment_received ? "Paid" : "Pending"}
+          {c.payment_received ? " · Paid" : " · Pending"}
         </span>
       </div>
       <span className="text-xs text-muted-foreground">
