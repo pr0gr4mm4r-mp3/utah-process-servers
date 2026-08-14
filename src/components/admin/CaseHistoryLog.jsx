@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { format } from "date-fns";
-import { Clock, CheckCircle, AlertCircle, Target } from "lucide-react";
+import { Clock, CheckCircle, AlertCircle, Target, MapPin } from "lucide-react";
 
 const STATUS_LABELS = {
   pending: "Pending",
@@ -43,6 +43,8 @@ export default function CaseHistoryLog({ caseId }) {
           <div className="mt-0.5 flex-shrink-0">
             {log.event_type === "attempt" ? (
               <Target className="w-4 h-4 text-primary" />
+            ) : log.event_type === "address_served" ? (
+              <MapPin className="w-4 h-4 text-green-600" />
             ) : (
               <Clock className="w-4 h-4 text-muted-foreground" />
             )}
@@ -51,6 +53,10 @@ export default function CaseHistoryLog({ caseId }) {
             {log.event_type === "attempt" ? (
               <p className="font-medium text-foreground">
                 Attempt #{log.attempt_number} — Service attempted{log.respondent_name ? ` on ${log.respondent_name}` : ""}
+              </p>
+            ) : log.event_type === "address_served" ? (
+              <p className="font-medium text-foreground">
+                {log.respondent_name ? `${log.respondent_name} — ` : ""}Address marked as served
               </p>
             ) : (
               <p className="font-medium text-foreground">

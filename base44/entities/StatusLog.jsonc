@@ -10,7 +10,8 @@
       "type": "string",
       "enum": [
         "status_change",
-        "attempt"
+        "attempt",
+        "address_served"
       ],
       "description": "Type of log event"
     },

@@ -15,6 +15,7 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 import CaseHistoryLog from "@/components/admin/CaseHistoryLog";
 import RespondentAttemptSection from "@/components/admin/RespondentAttemptSection";
+import AddressCompletionSection from "@/components/admin/AddressCompletionSection";
 import { calculateCaseTotal, chargeableUnits, getUnitPrice } from "@/lib/caseUtils";
 
 const STATUS_STYLES = {
@@ -283,6 +284,13 @@ Licensed & Bonded in Utah`.trim(),
                     ))}
                   </div>
                 </div>
+
+                {/* Address Completion — per-address served tracking */}
+                <AddressCompletionSection
+                  caseData={caseData}
+                  onUpdate={onUpdate}
+                  onLogChange={() => setLogKey((k) => k + 1)}
+                />
 
                 {/* Dates */}
                 <div>
