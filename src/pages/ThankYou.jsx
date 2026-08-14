@@ -81,7 +81,7 @@ export default function ThankYou() {
         }
 
         const paymentMethod = checkout.paymentMethod || "other";
-        const isInstant = paymentMethod === "paypal" || paymentMethod === "stripe";
+        const isInstant = paymentMethod === "paypal" || paymentMethod === "stripe" || paymentMethod === "base44";
 
         // Refresh guard
         if (localStorage.getItem("ups_finalized") === "1") {

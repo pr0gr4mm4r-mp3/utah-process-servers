@@ -8,7 +8,19 @@ Deno.serve(async (req) => {
 
     const WIX_API_KEY = Deno.env.get("WIX_PAYMENTS_API_KEY");
     const WIX_SITE_ID = Deno.env.get("WIX_PAYMENTS_SITE_ID");
-    const origin = req.headers.get("Origin") || "";
+
+    if (!WIX_API_KEY || !WIX_SITE_ID) {
+      console.error("createCheckout: Missing WIX_PAYMENTS_API_KEY or WIX_PAYMENTS_SITE_ID");
+      return Response.json({ error: "Payment processing not configured" }, { status: 500 });
+    }
+
+    // Build app URL from X-Base44-App-Url header (preferred), falling back to Origin.
+    // Never trust Origin alone in production — it's caller-controlled and wrong in PWAs/preview.
+    const appUrl = req.headers.get("X-Base44-App-Url") || req.headers.get("Origin") || "";
+    if (!appUrl) {
+      console.error("createCheckout: No app URL available for return URLs");
+      return Response.json({ error: "Unable to determine app URL for checkout" }, { status: 500 });
+    }
 
     const response = await fetch(
       "https://www.wixapis.com/payments/platform/v1/checkout-sessions/construct",
@@ -28,8 +40,8 @@ Deno.serve(async (req) => {
             }],
           },
           callbackUrls: {
-            postFlowUrl: origin || "https://example.com",
-            thankYouPageUrl: `${origin}/thank-you`,
+            postFlowUrl: appUrl,
+            thankYouPageUrl: `${appUrl}/thank-you`,
           },
         }),
       }
@@ -38,7 +50,7 @@ Deno.serve(async (req) => {
     const data = await response.json();
 
     if (!response.ok) {
-      console.error("Wix checkout API error:", JSON.stringify(data));
+      console.error("createCheckout: Wix API error:", JSON.stringify(data));
       return Response.json({ error: data.message || "Failed to create checkout" }, { status: response.status });
     }
 
@@ -47,7 +59,7 @@ Deno.serve(async (req) => {
       sessionId: data.checkoutSession.id,
     });
   } catch (error) {
-    console.error("create-checkout error:", error.message);
+    console.error("createCheckout error:", error.message);
     return Response.json({ error: error.message }, { status: 500 });
   }
 });

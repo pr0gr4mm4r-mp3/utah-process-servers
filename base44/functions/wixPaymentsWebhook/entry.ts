@@ -5,9 +5,9 @@ Deno.serve(async (req) => {
   try {
     const body = await req.text();
 
-    const WEBHOOK_PUBLIC_KEY = Deno.env.get("WIX_PAYMENTS_WEBHOOK_PUBLIC_KEY");
+    const WEBHOOK_PUBLIC_KEY = Deno.env.get("WIX_CHECKOUT_WEBHOOK_PUBLIC_KEY") || Deno.env.get("WIX_PAYMENTS_WEBHOOK_PUBLIC_KEY");
     if (!WEBHOOK_PUBLIC_KEY) {
-      console.error("Missing WIX_PAYMENTS_WEBHOOK_PUBLIC_KEY");
+      console.error("Missing WIX_CHECKOUT_WEBHOOK_PUBLIC_KEY / WIX_PAYMENTS_WEBHOOK_PUBLIC_KEY");
       return new Response("Configuration error", { status: 500 });
     }
 
@@ -34,10 +34,16 @@ Deno.serve(async (req) => {
       const cases = await base44.asServiceRole.entities.Case.filter({ checkout_id: checkoutId });
 
       if (cases.length > 0) {
-        await base44.asServiceRole.entities.Case.update(cases[0].id, {
-          payment_status: "paid",
-        });
-        console.log(`Updated case ${cases[0].id} payment status to paid`);
+        // Idempotent: only update if not already marked paid
+        if (cases[0].payment_status !== "paid") {
+          await base44.asServiceRole.entities.Case.update(cases[0].id, {
+            payment_status: "paid",
+            payment_received: true,
+          });
+          console.log(`Updated case ${cases[0].id} payment status to paid`);
+        } else {
+          console.log(`Case ${cases[0].id} already marked paid — skipping (idempotent)`);
+        }
       } else {
         console.log(`No case found yet for checkoutId ${checkoutId} - payment recorded, awaiting document submission`);
       }
