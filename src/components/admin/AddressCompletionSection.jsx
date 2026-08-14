@@ -65,11 +65,39 @@ export default function AddressCompletionSection({ caseData, onUpdate, onLogChan
         note: `${marking ? "Service completed" : "Service unmarked"} — ${addr.address}`,
       });
 
+      // Send the same completion notification as a whole-case Served update.
+      // sendClientEmail delivers to the client AND CCs the office.
+      if (marking && caseData.email) {
+        base44.functions
+          .invoke("sendClientEmail", {
+            to: caseData.email,
+            subject: `Service Complete — Documents Served${caseData.case_number ? ` — Case #${caseData.case_number}` : ""}`,
+            body: `Dear ${caseData.attorney || "Valued Client"},
+
+Your documents have been successfully served at the following address:
+
+${addr.address}
+
+A proof of service will be provided to you.
+
+Case Details:
+- Case Number: ${caseData.case_number || "N/A"}
+- Service Type: ${caseData.service_type}
+- Respondent: ${addr.label}
+
+If you have any questions, please call us at (801) 755-5445 or email utahproservers@yahoo.com.
+
+Utah Process Servers
+Licensed & Bonded in Utah`.trim(),
+          })
+          .catch(() => {});
+      }
+
       onUpdate(updated);
       onLogChange();
       toast.success(
         marking
-          ? `Address marked as served — ${addr.address}`
+          ? `Address marked as served — client & office notified`
           : `Address unmarked — ${addr.address}`
       );
     } catch {
