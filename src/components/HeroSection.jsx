@@ -1,11 +1,28 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Shield, Clock, MapPin } from "lucide-react";
+import { ArrowRight, Check, Clock, Shield, MapPin } from "lucide-react";
+import { PACKAGES, FEATURED_IDS } from "@/lib/packages";
 
 export default function HeroSection() {
+  const featured = PACKAGES.filter((p) => FEATURED_IDS.includes(p.id));
+
+  const handleSelect = (pkg) => {
+    localStorage.setItem(
+      "ups_package",
+      JSON.stringify({
+        id: pkg.id,
+        name: pkg.name,
+        price: pkg.price,
+        serviceType: pkg.serviceType,
+        turnaround: pkg.turnaround,
+      })
+    );
+    window.location.href = "/submit";
+  };
+
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden">
+    <section className="relative min-h-screen flex flex-col overflow-hidden">
       {/* Background image */}
       <div className="absolute inset-0">
         <img
@@ -13,110 +30,121 @@ export default function HeroSection() {
           alt="Salt Lake Valley skyline — Utah Process Servers serving all of Salt Lake County"
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#1A1C1E]/90 via-[#1A1C1E]/70 to-[#1A1C1E]/40" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1A1C1E]/92 via-[#1A1C1E]/85 to-[#1A1C1E]/96" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 w-full pt-32 pb-48 lg:pt-12 lg:pb-24">
-        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
-          {/* Left — headline */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-          >
-            <div className="inline-flex items-center gap-2 border border-white/20 rounded-full px-4 py-1.5 mb-8">
-              <div className="w-1.5 h-1.5 bg-[#C4A265] rounded-full animate-pulse" />
-              <span className="text-xs font-medium text-white/70 tracking-widest uppercase">
-                Serving the Salt Lake Valley for Over 15 Years
-              </span>
-            </div>
+      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12 w-full pt-28 pb-10 flex-1 flex flex-col">
+        {/* Headline */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          className="text-center mb-10"
+        >
+          <div className="inline-flex items-center gap-2 border border-white/20 rounded-full px-4 py-1.5 mb-6">
+            <div className="w-1.5 h-1.5 bg-[#C4A265] rounded-full animate-pulse" />
+            <span className="text-xs font-medium text-white/70 tracking-widest uppercase">
+              Serving the Salt Lake Valley for Over 15 Years
+            </span>
+          </div>
 
-            <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-[1.08] tracking-tight">
-              Salt Lake Valley's{" "}
-              <span className="italic text-[#C4A265]">Trusted</span>{" "}
-              Process Servers.
-            </h1>
+          <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-[1.08] tracking-tight">
+            Salt Lake Valley's{" "}
+            <span className="italic text-[#C4A265]">Trusted</span>{" "}
+            Process Servers.
+          </h1>
 
-            <p className="mt-8 text-lg text-white/60 max-w-lg leading-relaxed font-light">
-              For over 15 years, we have served the Salt Lake Valley with precision, compliance, and unwavering reliability. We deliver legal documents to any address in Salt Lake County with speed, accuracy, and full Rule 4 compliance.
-            </p>
+          <p className="mt-6 text-lg text-white/60 max-w-2xl mx-auto leading-relaxed font-light">
+            Rule 4 compliant service across all of Salt Lake County. Certified proof of service, court-admissible documentation, and same-day options available.
+          </p>
+        </motion.div>
 
-            <div className="flex flex-col sm:flex-row gap-4 mt-10">
-              <a href="#pricing" className="w-full sm:w-auto">
-                <Button className="w-full bg-[#C4A265] text-[#1A1C1E] hover:bg-[#C4A265]/90 font-semibold text-base px-8 py-6 tracking-wide">
-                  Check Pricing
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </a>
-              <a href="tel:+18017555445" className="w-full sm:w-auto">
-                <Button
-                  variant="outline"
-                  className="w-full border-white/25 text-white hover:bg-white/10 font-medium text-base px-8 py-6 bg-transparent"
-                >
-                  Call Now
-                </Button>
-              </a>
-            </div>
-          </motion.div>
+        {/* Pricing cards — front and center */}
+        <div id="pricing" className="grid md:grid-cols-3 gap-5 lg:gap-6 max-w-5xl mx-auto w-full scroll-mt-24">
+          {featured.map((pkg, i) => (
+            <motion.div
+              key={pkg.id}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 + i * 0.1, ease: "easeOut" }}
+              className={`relative rounded-2xl p-7 flex flex-col ${
+                pkg.popular
+                  ? "bg-white/[0.10] backdrop-blur-xl border border-[#C4A265]/40 shadow-2xl ring-1 ring-[#C4A265]/25"
+                  : "bg-white/[0.06] backdrop-blur-xl border border-white/10"
+              }`}
+            >
+              {pkg.popular && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                  <span className="bg-[#C4A265] text-[#1A1C1E] text-xs font-bold px-4 py-1 rounded-full tracking-wide uppercase">
+                    Most Popular
+                  </span>
+                </div>
+              )}
 
-          {/* Right — quick action card */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
-            className="hidden lg:block"
-          >
-            <div className="bg-white/[0.07] backdrop-blur-xl border border-white/10 rounded-2xl p-8">
-              <p className="text-xs tracking-widest uppercase text-white/50 mb-6 font-medium">
-                Quick Service Overview
-              </p>
-
-              <div className="space-y-5">
-                {[
-                  {
-                    icon: Shield,
-                    title: "Rule 4 Compliant",
-                    desc: "Every service follows Utah Rules of Civil Procedure",
-                  },
-                  {
-                    icon: Clock,
-                    title: "Same-Day Service Available",
-                    desc: "Rush and same-day options for urgent filings",
-                  },
-                  {
-                    icon: MapPin,
-                    title: "Salt Lake Valley",
-                    desc: "Complete coverage across all Salt Lake County cities",
-                  },
-                ].map((item) => (
-                  <div
-                    key={item.title}
-                    className="flex items-start gap-4 p-4 rounded-xl bg-white/[0.04] border border-white/[0.06] hover:bg-white/[0.08] transition-colors"
-                  >
-                    <div className="w-10 h-10 rounded-lg bg-[#C4A265]/15 flex items-center justify-center flex-shrink-0">
-                      <item.icon className="w-5 h-5 text-[#C4A265]" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-white text-sm">{item.title}</p>
-                      <p className="text-white/45 text-sm mt-0.5">{item.desc}</p>
-                    </div>
-                  </div>
-                ))}
+              <h3 className="font-heading text-xl font-bold text-white mb-1">{pkg.name}</h3>
+              <div className="flex items-center gap-1.5 text-sm text-white/50 mb-5">
+                <Clock className="w-3.5 h-3.5" />
+                {pkg.turnaround}
               </div>
 
-              <a href="#pricing" className="block mt-6">
-                <Button className="w-full bg-white text-[#1A1C1E] hover:bg-white/90 font-semibold py-5">
-                  View Pricing
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </a>
-            </div>
-          </motion.div>
+              <div className="flex items-baseline mb-1">
+                <span className="text-4xl font-bold text-white">${parseInt(pkg.price)}</span>
+              </div>
+              <p className="text-xs text-white/40 mb-4">+ 3.5% processing fee added at checkout</p>
+
+              <p className="text-sm text-white/55 mb-6">{pkg.description}</p>
+
+              <ul className="space-y-2.5 mb-7 flex-1">
+                {pkg.features.map((f) => (
+                  <li key={f} className="flex items-start gap-2 text-sm text-white/70">
+                    <Check className="w-4 h-4 text-[#C4A265] flex-shrink-0 mt-0.5" />
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <Button
+                onClick={() => handleSelect(pkg)}
+                className={`w-full py-5 font-semibold gap-2 ${
+                  pkg.popular
+                    ? "bg-[#C4A265] text-[#1A1C1E] hover:bg-[#C4A265]/90"
+                    : "bg-white text-[#1A1C1E] hover:bg-white/90"
+                }`}
+              >
+                Continue
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </motion.div>
+          ))}
         </div>
+
+        {/* Processing fee disclosure */}
+        <p className="text-xs text-white/35 text-center leading-relaxed max-w-3xl mx-auto mt-8">
+          <strong className="text-white/45">Payment Processing Fee Disclosure:</strong> A 3.5% processing fee is added at checkout to all transactions to compensate for card processing costs. This fee is charged by our payment processor and is not retained by Utah Process Servers.
+        </p>
+
+        {/* Trust badges */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
+          className="flex flex-wrap items-center justify-center gap-6 mt-8 text-white/50"
+        >
+          {[
+            { icon: Shield, label: "Rule 4 Compliant" },
+            { icon: Clock, label: "Same-Day Available" },
+            { icon: MapPin, label: "All Salt Lake County" },
+          ].map((item) => (
+            <div key={item.label} className="flex items-center gap-2 text-sm">
+              <item.icon className="w-4 h-4 text-[#C4A265]" />
+              {item.label}
+            </div>
+          ))}
+        </motion.div>
       </div>
 
       {/* Bottom stat bar */}
-      <div className="absolute bottom-0 left-0 right-0 border-t border-white/10 bg-[#1A1C1E]/60 backdrop-blur-md">
+      <div className="relative z-10 border-t border-white/10 bg-[#1A1C1E]/60 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 lg:px-12 py-5">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
