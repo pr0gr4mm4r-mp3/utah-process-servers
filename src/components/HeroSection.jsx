@@ -68,6 +68,8 @@ export default function HeroSection() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 + i * 0.1, ease: "easeOut" }}
               className={`relative rounded-2xl p-7 flex flex-col ${
+                pkg.popular ? "order-first md:order-none " : ""
+              }${
                 pkg.popular
                   ? "bg-white/[0.10] backdrop-blur-xl border border-[#C4A265]/40 shadow-2xl ring-1 ring-[#C4A265]/25"
                   : "bg-white/[0.06] backdrop-blur-xl border border-white/10"
