@@ -113,6 +113,32 @@
       },
       "description": "Keys of addresses marked as served (e.g. 'primary', 'additional-0', 'respondent-0')"
     },
+    "address_results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "Address key matching served_addresses keys (e.g. 'primary', 'additional-0', 'respondent-0')"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "served",
+              "failed"
+            ],
+            "description": "Per-address outcome"
+          },
+          "served_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When service was completed at this address"
+          }
+        }
+      },
+      "description": "Per-address service results with served_at timestamps"
+    },
     "checkout_id": {
       "type": "string",
       "description": "Checkout session ID"
