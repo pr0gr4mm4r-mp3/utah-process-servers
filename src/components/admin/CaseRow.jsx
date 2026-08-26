@@ -25,7 +25,7 @@ export default function CaseRow({ caseData: c, onClick }) {
     paypal: "PayPal",
     zelle: "Zelle",
     venmo: "Venmo",
-    base44: "Base44",
+    base44: "Card",
     other: "Other",
   };
 

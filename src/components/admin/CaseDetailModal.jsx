@@ -30,7 +30,7 @@ const PAYMENT_METHOD_LABELS = {
   paypal: "PayPal",
   zelle: "Zelle",
   venmo: "Venmo",
-  base44: "Base44 Payments",
+  base44: "Credit / Debit Card",
   other: "Other",
 };
 
