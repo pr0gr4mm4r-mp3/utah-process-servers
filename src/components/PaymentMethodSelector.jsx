@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
-import { Smartphone, Loader2, X, AlertCircle, CreditCard } from "lucide-react";
+import { Smartphone, Loader2, X, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -19,7 +19,6 @@ export default function PaymentMethodSelector({ pkg, onClose, existingCase }) {
   const [paypalReady, setPaypalReady] = useState(false);
   const [paypalError, setPaypalError] = useState(null);
   const [paypalRetryKey, setPaypalRetryKey] = useState(0);
-  const [loadingCard, setLoadingCard] = useState(false);
 
   const basePrice = parseFloat(pkg.price) || 0;
   const processingFee = basePrice * 0.035;
@@ -115,32 +114,6 @@ export default function PaymentMethodSelector({ pkg, onClose, existingCase }) {
     }).render("#paypal-button-container");
   }, [paypalReady, pkg, paypalRetryKey]);
 
-  const handleCardPayment = async () => {
-    setLoadingCard(true);
-    try {
-      const res = await base44.functions.invoke("createCheckout", {
-        packageName: pkg.name,
-        packagePrice: totalPrice,
-      });
-      if (res.data?.redirectUrl) {
-        localStorage.setItem("ups_checkout", JSON.stringify({
-          sessionId: res.data.sessionId,
-          packageName: pkg.name,
-          packagePrice: totalPrice,
-          serviceType: pkg.serviceType,
-          paymentMethod: "base44",
-        }));
-        window.location.href = res.data.redirectUrl;
-      } else {
-        toast.error("Unable to start card payment. Please try another method.");
-        setLoadingCard(false);
-      }
-    } catch (err) {
-      toast.error("Card payment setup failed. Please try another method.");
-      setLoadingCard(false);
-    }
-  };
-
   const handleManual = (method) => {
     const params = new URLSearchParams({
       method,
@@ -194,28 +167,6 @@ export default function PaymentMethodSelector({ pkg, onClose, existingCase }) {
             </div>
           ) : (
             <div className="space-y-3">
-              {/* Card / Base44 Payments — includes 3.5% processing fee */}
-              {!existingCase && config?.wixPaymentsEnabled && (
-                <button
-                  onClick={handleCardPayment}
-                  disabled={loadingCard}
-                  className="w-full border border-border rounded-xl px-4 py-4 flex items-center gap-3 hover:bg-muted/30 transition-colors text-left disabled:opacity-50"
-                >
-                  <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <CreditCard className="w-4 h-4 text-primary" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-sm text-foreground">Pay with Card</p>
-                    <p className="text-xs text-muted-foreground">Visa, Mastercard, Amex — secure checkout</p>
-                  </div>
-                  {loadingCard ? (
-                    <Loader2 className="w-4 h-4 animate-spin text-primary ml-auto" />
-                  ) : (
-                    <span className="ml-auto text-xs text-muted-foreground">3.5% fee included</span>
-                  )}
-                </button>
-              )}
-
               {/* PayPal */}
               {config?.paypalClientId && (
                 <div className="border border-border rounded-xl overflow-hidden">
