@@ -24,6 +24,7 @@ const paymentConfig = {
 const paymentMethodLabels = {
   paypal: "PayPal",
   stripe: "Card",
+  base44: "Card",
   zelle: "Zelle",
   venmo: "Venmo",
   other: "Other",
