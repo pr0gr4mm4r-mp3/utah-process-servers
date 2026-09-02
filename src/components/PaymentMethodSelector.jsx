@@ -25,10 +25,16 @@ export default function PaymentMethodSelector({ pkg, onClose, existingCase }) {
   const totalPrice = (basePrice + processingFee).toFixed(2);
 
   useEffect(() => {
-    base44.functions.invoke("getPaymentConfig").then((res) => {
-      setConfig(res.data || {});
-      setLoadingConfig(false);
-    });
+    base44.functions.invoke("getPaymentConfig")
+      .then((res) => {
+        setConfig(res.data || {});
+      })
+      .catch(() => {
+        // Backend function unavailable (e.g. plan doesn't include functions) —
+        // fall back to empty config so manual payment options still render.
+        setConfig({});
+      })
+      .finally(() => setLoadingConfig(false));
   }, []);
 
   // Load PayPal SDK when config is ready

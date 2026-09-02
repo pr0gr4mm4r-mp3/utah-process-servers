@@ -19,9 +19,13 @@ export default function ZelleVenmoPayment() {
   const [config, setConfig] = useState({ zelleEmail: "", venmoHandle: "" });
 
   useEffect(() => {
-    base44.functions.invoke("getPaymentConfig").then((res) => {
-      setConfig(res.data || {});
-    });
+    base44.functions.invoke("getPaymentConfig")
+      .then((res) => {
+        setConfig(res.data || {});
+      })
+      .catch(() => {
+        setConfig({});
+      });
   }, []);
 
   const [selectedMethod, setSelectedMethod] = useState(method);
