@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
-import { Smartphone, Loader2, X, AlertCircle } from "lucide-react";
+import { Smartphone, Loader2, X, AlertCircle, CreditCard } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -46,7 +46,7 @@ export default function PaymentMethodSelector({ pkg, onClose, existingCase }) {
     }
     const script = document.createElement("script");
     script.id = "paypal-sdk";
-    script.src = `https://www.paypal.com/sdk/js?client-id=${config.paypalClientId}&currency=USD`;
+    script.src = `https://www.paypal.com/sdk/js?client-id=${config.paypalClientId}&currency=USD&enable-funding=card`;
     script.onload = () => {
       setPaypalReady(true);
     };
@@ -56,12 +56,9 @@ export default function PaymentMethodSelector({ pkg, onClose, existingCase }) {
   // Render PayPal buttons after SDK ready
   useEffect(() => {
     if (!paypalReady || !config?.paypalClientId) return;
-    const container = document.getElementById("paypal-button-container");
-    if (!container) return;
-    // Clear any previous buttons (for retries)
-    container.innerHTML = "";
 
-    window.paypal.Buttons({
+    const buttonConfig = (fundingSource) => ({
+      fundingSource,
       createOrder: (data, actions) => {
         setPaypalError(null);
         return actions.order.create({
@@ -117,7 +114,25 @@ export default function PaymentMethodSelector({ pkg, onClose, existingCase }) {
         setPaypalError("PayPal checkout encountered an error. You can try again below or use another payment method.");
         toast.error("PayPal checkout failed. Please try again or use another method.");
       },
-    }).render("#paypal-button-container");
+    });
+
+    // Card-funded button (routes to PayPal's card entry widget)
+    const cardContainer = document.getElementById("paypal-card-container");
+    if (cardContainer) {
+      cardContainer.innerHTML = "";
+      try {
+        window.paypal.Buttons(buttonConfig("card")).render("#paypal-card-container");
+      } catch {
+        // Card funding not eligible for this account — container stays empty
+      }
+    }
+
+    // Standard PayPal button
+    const stdContainer = document.getElementById("paypal-button-container");
+    if (stdContainer) {
+      stdContainer.innerHTML = "";
+      window.paypal.Buttons(buttonConfig(undefined)).render("#paypal-button-container");
+    }
   }, [paypalReady, pkg, paypalRetryKey]);
 
   const handleManual = (method) => {
@@ -173,6 +188,41 @@ export default function PaymentMethodSelector({ pkg, onClose, existingCase }) {
             </div>
           ) : (
             <div className="space-y-3">
+              {/* Card via PayPal */}
+              {config?.paypalClientId && (
+                <div className="border border-border rounded-xl overflow-hidden">
+                  <div className="px-4 pt-3 pb-1 text-xs text-muted-foreground font-medium flex items-center gap-2">
+                    <CreditCard className="w-4 h-4 text-primary" />
+                    Pay with Card
+                  </div>
+                  <div className="px-4 pb-3">
+                    {loadingPaypal && (
+                      <div className="flex items-center justify-center py-4 mb-3 bg-muted/30 rounded-lg">
+                        <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                        <span className="ml-2 text-sm text-muted-foreground">Verifying payment...</span>
+                      </div>
+                    )}
+                    {paypalError && (
+                      <div className="mb-3 p-3 bg-destructive/10 border border-destructive/20 rounded-lg text-sm text-destructive flex items-start gap-2">
+                        <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                        <span>{paypalError}</span>
+                      </div>
+                    )}
+                    {paypalReady ? (
+                      <div id="paypal-card-container" />
+                    ) : (
+                      <div className="flex items-center justify-center py-4">
+                        <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+                        <span className="ml-2 text-sm text-muted-foreground">Loading card checkout...</span>
+                      </div>
+                    )}
+                    <p className="text-xs text-muted-foreground text-center mt-2">
+                      Secure card payment processed via PayPal — no PayPal account required.
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* PayPal */}
               {config?.paypalClientId && (
                 <div className="border border-border rounded-xl overflow-hidden">
