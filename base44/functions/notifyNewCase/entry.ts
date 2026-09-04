@@ -1,5 +1,4 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
-import { sendSms } from "../../shared/twilio.ts";
 
 Deno.serve(async (req) => {
   try {
@@ -38,13 +37,6 @@ ${c.special_instructions || "None"}
 Log in to the Admin Dashboard to update status and assign a server.
 `,
     });
-
-    // SMS alert to the office (Mitch) — always sent on new case submission
-    const sms = await sendSms(
-      "(801) 755-5445",
-      `New case submitted: ${c.case_number || "No Case #"} — ${c.service_type} — Respondent: ${c.respondent_name}. Check the Admin Dashboard.`
-    );
-    if (!sms.ok) console.error("notifyNewCase SMS failed:", sms.error);
 
     return Response.json({ ok: true });
   } catch (error) {

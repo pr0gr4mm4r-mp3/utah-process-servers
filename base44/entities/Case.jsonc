@@ -26,11 +26,6 @@
       "type": "string",
       "description": "Client phone number"
     },
-    "text_notifications_opt_in": {
-      "type": "boolean",
-      "default": false,
-      "description": "Whether the client opted in to receive text message notifications about their case"
-    },
     "service_type": {
       "type": "string",
       "description": "Type of process service requested"

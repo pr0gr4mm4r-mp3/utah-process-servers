@@ -132,7 +132,6 @@ export default function ThankYou() {
             package_price: price,
             status: "pending",
             submitted_at: submission.submitted_at || new Date().toISOString(),
-            text_notifications_opt_in: false,
           });
           createdIds.push(created.id);
         }
