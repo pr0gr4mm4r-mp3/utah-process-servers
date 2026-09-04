@@ -39,8 +39,9 @@ export default function RespondentAttemptSection({
         respondent_name: respondentName,
       });
 
+      let clientNotified = !caseData.email;
       if (caseData.email) {
-        await base44.functions.invoke("sendClientEmail", {
+        const emailRes = await base44.functions.invoke("sendClientEmail", {
           to: caseData.email,
           subject: `Service Update — Attempt #${attemptNumber} for ${respondentName}`,
           body: `Dear ${caseData.attorney || "Valued Client"},
@@ -64,11 +65,16 @@ For questions, call (801) 755-5445 or email utahproservers@yahoo.com.
 Utah Process Servers
 Licensed & Bonded in Utah`.trim(),
         });
+        clientNotified = emailRes.data?.client !== false;
       }
 
       onUpdate(updated);
       onLogChange();
-      toast.success(`Attempt #${attemptNumber} recorded for ${respondentName} — client notified`);
+      toast.success(
+        clientNotified
+          ? `Attempt #${attemptNumber} recorded for ${respondentName} — client notified`
+          : `Attempt #${attemptNumber} recorded — email delivery failed, office copy sent`
+      );
     } catch {
       toast.error("Failed to record attempt. Please try again.");
     } finally {

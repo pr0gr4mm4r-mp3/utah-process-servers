@@ -74,6 +74,16 @@ Deno.serve(async (req) => {
       } catch (err) {
         result.clientError = err.message;
         console.error("sendClientEmail: client email via Gmail API failed:", err.message);
+
+        // Fallback: try the built-in SendEmail integration (works for external
+        // addresses on a paid plan with a custom domain connected).
+        try {
+          await base44.asServiceRole.integrations.Core.SendEmail({ to, subject, body });
+          result.client = true;
+          result.clientError = null;
+        } catch (fallbackErr) {
+          console.error("sendClientEmail: built-in SendEmail fallback failed:", fallbackErr.message);
+        }
       }
     }
 
