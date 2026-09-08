@@ -96,6 +96,7 @@
         "pending",
         "in_progress",
         "delivered",
+        "pending_proof",
         "failed"
       ],
       "default": "pending",

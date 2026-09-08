@@ -14,12 +14,14 @@ const TABS = [
   { key: "pending", label: "Pending" },
   { key: "submitted", label: "By Date Submitted" },
   { key: "delivered", label: "By Date Served" },
+  { key: "pending_proof", label: "Pending Proof" },
 ];
 
 const STATUS_COLORS = {
   pending: "bg-yellow-50 text-yellow-700 border-yellow-200",
   in_progress: "bg-blue-50 text-blue-700 border-blue-200",
   delivered: "bg-green-50 text-green-700 border-green-200",
+  pending_proof: "bg-purple-50 text-purple-700 border-purple-200",
   failed: "bg-red-50 text-red-700 border-red-200",
 };
 
@@ -95,6 +97,12 @@ export default function AdminDashboard() {
     } else if (activeTab === "delivered") {
       list = list.filter((c) => c.delivered_at);
       list.sort((a, b) => new Date(b.delivered_at) - new Date(a.delivered_at));
+    } else if (activeTab === "pending_proof") {
+      list = list.filter((c) => c.status === "pending_proof");
+      list.sort(
+        (a, b) =>
+          new Date(b.updated_date) - new Date(a.updated_date)
+      );
     } else if (activeTab === "pending") {
       list = list.filter((c) => c.status === "pending" || c.status === "in_progress");
       list.sort(

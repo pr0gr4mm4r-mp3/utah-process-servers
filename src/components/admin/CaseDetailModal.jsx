@@ -22,6 +22,7 @@ const STATUS_STYLES = {
   pending: "bg-yellow-50 text-yellow-700",
   in_progress: "bg-blue-50 text-blue-700",
   delivered: "bg-green-50 text-green-700",
+  pending_proof: "bg-purple-50 text-purple-700",
   failed: "bg-red-50 text-red-700",
 };
 
@@ -82,6 +83,7 @@ export default function CaseDetailModal({ caseData, onClose, onUpdate }) {
           pending: { subject: "Your Case is Now Pending", body: "Your case is now pending. We will begin service shortly." },
           in_progress: { subject: "Your Case is Now In Progress", body: "We have begun working on your case. Our team is actively attempting to serve the documents." },
           delivered: { subject: "Service Complete — Documents Served", body: "Your documents have been successfully served on the respondent. A proof of service will be provided to you." },
+          pending_proof: { subject: "Proof of Service in Progress", body: "Service on the respondent is complete. We are now preparing your proof of service and will send it to you shortly." },
           failed: { subject: "Service Update on Your Case", body: "We were unable to complete service on your case. Please contact us to discuss next steps." },
         };
         const info = STATUS_EMAILS[status];
@@ -416,6 +418,7 @@ Licensed & Bonded in Utah`.trim(),
                       <SelectItem value="pending">Pending</SelectItem>
                       <SelectItem value="in_progress">In Progress</SelectItem>
                       <SelectItem value="delivered">Served</SelectItem>
+                      <SelectItem value="pending_proof">Pending Proof</SelectItem>
                       <SelectItem value="failed">Failed</SelectItem>
                     </SelectContent>
                   </Select>
