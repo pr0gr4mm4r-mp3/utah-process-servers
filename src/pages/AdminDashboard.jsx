@@ -95,8 +95,8 @@ export default function AdminDashboard() {
           new Date(a.submitted_at || a.created_date)
       );
     } else if (activeTab === "delivered") {
-      list = list.filter((c) => c.delivered_at);
-      list.sort((a, b) => new Date(b.delivered_at) - new Date(a.delivered_at));
+      list = list.filter((c) => c.status === "delivered");
+      list.sort((a, b) => new Date(b.delivered_at || b.updated_date) - new Date(a.delivered_at || a.updated_date));
     } else if (activeTab === "pending_proof") {
       list = list.filter((c) => c.status === "pending_proof");
       list.sort(

@@ -6,8 +6,8 @@ import { Clock, CheckCircle, AlertCircle, Target, MapPin } from "lucide-react";
 const STATUS_LABELS = {
   pending: "Pending",
   in_progress: "In Progress",
-  delivered: "Served",
-  pending_proof: "Pending Proof",
+  pending_proof: "Served",
+  delivered: "Served with Proof",
   failed: "Failed",
 };
 

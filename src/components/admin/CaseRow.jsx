@@ -14,8 +14,8 @@ const STATUS_STYLES = {
 const STATUS_LABELS = {
   pending: "Pending",
   in_progress: "In Progress",
-  delivered: "Served",
-  pending_proof: "Pending Proof",
+  pending_proof: "Served",
+  delivered: "Served with Proof",
   failed: "Failed",
 };
 

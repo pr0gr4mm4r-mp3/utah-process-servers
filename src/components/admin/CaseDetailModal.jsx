@@ -82,8 +82,8 @@ export default function CaseDetailModal({ caseData, onClose, onUpdate }) {
         const STATUS_EMAILS = {
           pending: { subject: "Your Case is Now Pending", body: "Your case is now pending. We will begin service shortly." },
           in_progress: { subject: "Your Case is Now In Progress", body: "We have begun working on your case. Our team is actively attempting to serve the documents." },
-          delivered: { subject: "Service Complete — Documents Served", body: "Your documents have been successfully served on the respondent. A proof of service will be provided to you." },
-          pending_proof: { subject: "Proof of Service in Progress", body: "Service on the respondent is complete. We are now preparing your proof of service and will send it to you shortly." },
+          pending_proof: { subject: "Service Complete — Proof of Service in Progress", body: "Your documents have been successfully served on the respondent. We are now preparing your proof of service and will send it to you shortly." },
+          delivered: { subject: "Proof of Service Sent — Case Complete", body: "Your proof of service has been completed and sent to you. Service on your case is now fully complete." },
           failed: { subject: "Service Update on Your Case", body: "We were unable to complete service on your case. Please contact us to discuss next steps." },
         };
         const info = STATUS_EMAILS[status];
@@ -417,8 +417,8 @@ Licensed & Bonded in Utah`.trim(),
                     <SelectContent>
                       <SelectItem value="pending">Pending</SelectItem>
                       <SelectItem value="in_progress">In Progress</SelectItem>
-                      <SelectItem value="delivered">Served</SelectItem>
-                      <SelectItem value="pending_proof">Pending Proof</SelectItem>
+                      <SelectItem value="pending_proof">Served</SelectItem>
+                      <SelectItem value="delivered">Served with Proof</SelectItem>
                       <SelectItem value="failed">Failed</SelectItem>
                     </SelectContent>
                   </Select>

@@ -12,8 +12,8 @@ import PaymentMethodSelector from "@/components/PaymentMethodSelector";
 const statusConfig = {
   pending: { label: "Pending", color: "text-amber-700 bg-amber-50 border-amber-200" },
   in_progress: { label: "In Progress", color: "text-blue-700 bg-blue-50 border-blue-200" },
-  delivered: { label: "Served", color: "text-green-700 bg-green-50 border-green-200" },
-  pending_proof: { label: "Pending Proof", color: "text-purple-700 bg-purple-50 border-purple-200" },
+  pending_proof: { label: "Served", color: "text-purple-700 bg-purple-50 border-purple-200" },
+  delivered: { label: "Served with Proof", color: "text-green-700 bg-green-50 border-green-200" },
   failed: { label: "Failed", color: "text-red-700 bg-red-50 border-red-200" },
 };
 
@@ -226,10 +226,17 @@ export default function CaseLookup() {
                   </div>
                 )}
 
+                {c.status === "pending_proof" && (
+                  <div className="mt-4 pt-4 border-t border-border text-sm text-purple-700 flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 flex-shrink-0" />
+                    Documents have been served. Proof of service is being prepared.
+                  </div>
+                )}
+
                 {c.status === "delivered" && (
                   <div className="mt-4 pt-4 border-t border-border text-sm text-green-700 flex items-center gap-2">
                     <CheckCircle className="w-4 h-4 flex-shrink-0" />
-                    Service has been completed.
+                    Service complete. Proof of service has been sent.
                   </div>
                 )}
               </motion.div>
