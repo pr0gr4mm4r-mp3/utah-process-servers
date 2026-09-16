@@ -139,7 +139,7 @@ export default function PaymentMethodSelector({ pkg, onClose, existingCase }) {
     const params = new URLSearchParams({
       method,
       packageName: pkg.name,
-      packagePrice: totalPrice,
+      packagePrice: basePrice.toFixed(2),
       serviceType: pkg.serviceType,
     });
     if (existingCase) {
