@@ -7,13 +7,12 @@ export default function ClientInfoSection({ value, onChange }) {
   return (
     <div className="grid sm:grid-cols-2 gap-6 bg-muted/30 border border-border rounded-xl p-6">
       <div>
-        <label className="text-sm font-medium text-foreground mb-2 block">
-          Attorney Name <span className="text-muted-foreground font-normal">(optional)</span>
-        </label>
+        <label className="text-sm font-medium text-foreground mb-2 block">Point of Contact *</label>
         <Input
-          value={value.attorneyName || ""}
-          onChange={(e) => set("attorneyName", e.target.value)}
-          placeholder="John Smith, Esq."
+          required
+          value={value.pointOfContact || ""}
+          onChange={(e) => set("pointOfContact", e.target.value)}
+          placeholder="Full name of person to contact"
           className="bg-background"
         />
       </div>
@@ -29,12 +28,13 @@ export default function ClientInfoSection({ value, onChange }) {
         />
       </div>
       <div>
-        <label className="text-sm font-medium text-foreground mb-2 block">Point of Contact *</label>
+        <label className="text-sm font-medium text-foreground mb-2 block">
+          Attorney Name <span className="text-muted-foreground font-normal">(optional)</span>
+        </label>
         <Input
-          required
-          value={value.pointOfContact || ""}
-          onChange={(e) => set("pointOfContact", e.target.value)}
-          placeholder="Full name of person to contact"
+          value={value.attorneyName || ""}
+          onChange={(e) => set("attorneyName", e.target.value)}
+          placeholder="John Smith, Esq."
           className="bg-background"
         />
       </div>
