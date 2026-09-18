@@ -16,7 +16,11 @@
     },
     "firm": {
       "type": "string",
-      "description": "Law firm or organization"
+      "description": "Law firm or organization (optional)"
+    },
+    "point_of_contact": {
+      "type": "string",
+      "description": "Primary point of contact for the case"
     },
     "email": {
       "type": "string",

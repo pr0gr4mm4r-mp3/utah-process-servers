@@ -34,7 +34,7 @@ const addressCount = (c) =>
   Math.max(1, [c.respondentAddress, ...(c.additionalAddresses || [])].filter((a) => a && a.trim()).length);
 
 export default function SecureSubmit() {
-  const [clientInfo, setClientInfo] = useState({ attorneyName: "", firm: "", email: "", phone: "" });
+  const [clientInfo, setClientInfo] = useState({ attorneyName: "", firm: "", pointOfContact: "", email: "", phone: "" });
   const [cases, setCases] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);

@@ -112,6 +112,7 @@ export default function ThankYou() {
             attorney: c.plaintiff,
             attorney_name: clientInfo.attorneyName,
             firm: clientInfo.firm,
+            point_of_contact: clientInfo.pointOfContact,
             email: clientInfo.email,
             phone: clientInfo.phone,
             service_type: pkg.serviceType,

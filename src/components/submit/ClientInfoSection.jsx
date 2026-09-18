@@ -18,11 +18,23 @@ export default function ClientInfoSection({ value, onChange }) {
         />
       </div>
       <div>
-        <label className="text-sm font-medium text-foreground mb-2 block">Law Firm / Organization</label>
+        <label className="text-sm font-medium text-foreground mb-2 block">
+          Law Firm / Organization <span className="text-muted-foreground font-normal">(optional)</span>
+        </label>
         <Input
           value={value.firm || ""}
           onChange={(e) => set("firm", e.target.value)}
           placeholder="Smith & Associates"
+          className="bg-background"
+        />
+      </div>
+      <div>
+        <label className="text-sm font-medium text-foreground mb-2 block">Point of Contact *</label>
+        <Input
+          required
+          value={value.pointOfContact || ""}
+          onChange={(e) => set("pointOfContact", e.target.value)}
+          placeholder="Full name of person to contact"
           className="bg-background"
         />
       </div>
