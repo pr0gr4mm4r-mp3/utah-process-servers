@@ -101,6 +101,7 @@
         "in_progress",
         "delivered",
         "pending_proof",
+        "cancelled",
         "failed"
       ],
       "default": "pending",

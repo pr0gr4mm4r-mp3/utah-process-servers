@@ -23,6 +23,7 @@ const STATUS_STYLES = {
   in_progress: "bg-blue-50 text-blue-700",
   delivered: "bg-green-50 text-green-700",
   pending_proof: "bg-purple-50 text-purple-700",
+  cancelled: "bg-gray-100 text-gray-600",
   failed: "bg-red-50 text-red-700",
 };
 
@@ -84,6 +85,7 @@ export default function CaseDetailModal({ caseData, onClose, onUpdate }) {
           in_progress: { subject: "Your Case is Now In Progress", body: "We have begun working on your case. Our team is actively attempting to serve the documents." },
           pending_proof: { subject: "Service Complete — Proof of Service in Progress", body: "Your documents have been successfully served on the respondent. We are now preparing your proof of service and will send it to you shortly." },
           delivered: { subject: "Proof of Service Sent — Case Complete", body: "Your proof of service has been completed and sent to you. Service on your case is now fully complete." },
+          cancelled: { subject: "Your Case Has Been Cancelled", body: "Your case has been cancelled. If you believe this is an error or would like to resubmit, please contact us at (801) 755-5445 or utahproservers@yahoo.com." },
           failed: { subject: "Service Update on Your Case", body: "We were unable to complete service on your case. Please contact us to discuss next steps." },
         };
         const info = STATUS_EMAILS[status];
@@ -420,6 +422,7 @@ Licensed & Bonded in Utah`.trim(),
                       <SelectItem value="in_progress">In Progress</SelectItem>
                       <SelectItem value="pending_proof">Served</SelectItem>
                       <SelectItem value="delivered">Served with Proof</SelectItem>
+                      <SelectItem value="cancelled">Cancelled</SelectItem>
                       <SelectItem value="failed">Failed</SelectItem>
                     </SelectContent>
                   </Select>

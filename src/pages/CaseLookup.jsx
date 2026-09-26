@@ -14,6 +14,7 @@ const statusConfig = {
   in_progress: { label: "In Progress", color: "text-blue-700 bg-blue-50 border-blue-200" },
   pending_proof: { label: "Served", color: "text-purple-700 bg-purple-50 border-purple-200" },
   delivered: { label: "Served with Proof", color: "text-green-700 bg-green-50 border-green-200" },
+  cancelled: { label: "Cancelled", color: "text-gray-700 bg-gray-100 border-gray-300" },
   failed: { label: "Failed", color: "text-red-700 bg-red-50 border-red-200" },
 };
 

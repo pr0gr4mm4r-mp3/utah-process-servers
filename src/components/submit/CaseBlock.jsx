@@ -114,19 +114,24 @@ export default function CaseBlock({ index, data, onChange, onRemove, canRemove }
 
       {/* Known address */}
       <div>
-        <label className="text-sm font-medium text-foreground mb-2 block">Known Address</label>
+        <label className="text-sm font-medium text-foreground mb-2 block">
+          Address for Service <span className="text-muted-foreground font-normal">(where the respondent can be found)</span>
+        </label>
         <Input
           value={data.respondentAddress || ""}
           onChange={(e) => set("respondentAddress", e.target.value)}
-          placeholder="Street, City, State, ZIP"
+          placeholder="Respondent's address — Street, City, State, ZIP"
           className="bg-background"
         />
+        <p className="text-xs text-muted-foreground mt-1.5">
+          Enter the address of the person being served — not your own address.
+        </p>
       </div>
 
       {/* Additional addresses */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <label className="text-sm font-medium text-foreground">Additional Addresses</label>
+          <label className="text-sm font-medium text-foreground">Additional Addresses for Service</label>
           <button
             type="button"
             onClick={addAddress}

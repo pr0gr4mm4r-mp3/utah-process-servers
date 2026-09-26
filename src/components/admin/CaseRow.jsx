@@ -8,6 +8,7 @@ const STATUS_STYLES = {
   in_progress: "bg-blue-50 text-blue-700 border-blue-200",
   delivered: "bg-green-50 text-green-700 border-green-200",
   pending_proof: "bg-purple-50 text-purple-700 border-purple-200",
+  cancelled: "bg-gray-100 text-gray-600 border-gray-300",
   failed: "bg-red-50 text-red-700 border-red-200",
 };
 
@@ -16,6 +17,7 @@ const STATUS_LABELS = {
   in_progress: "In Progress",
   pending_proof: "Served",
   delivered: "Served with Proof",
+  cancelled: "Cancelled",
   failed: "Failed",
 };
 

@@ -15,6 +15,7 @@ const TABS = [
   { key: "submitted", label: "By Date Submitted" },
   { key: "delivered", label: "By Date Served" },
   { key: "pending_proof", label: "Pending Proof" },
+  { key: "cancelled", label: "Cancelled" },
 ];
 
 const STATUS_COLORS = {
@@ -22,6 +23,7 @@ const STATUS_COLORS = {
   in_progress: "bg-blue-50 text-blue-700 border-blue-200",
   delivered: "bg-green-50 text-green-700 border-green-200",
   pending_proof: "bg-purple-50 text-purple-700 border-purple-200",
+  cancelled: "bg-gray-100 text-gray-600 border-gray-300",
   failed: "bg-red-50 text-red-700 border-red-200",
 };
 
@@ -99,6 +101,12 @@ export default function AdminDashboard() {
       list.sort((a, b) => new Date(b.delivered_at || b.updated_date) - new Date(a.delivered_at || a.updated_date));
     } else if (activeTab === "pending_proof") {
       list = list.filter((c) => c.status === "pending_proof");
+      list.sort(
+        (a, b) =>
+          new Date(b.updated_date) - new Date(a.updated_date)
+      );
+    } else if (activeTab === "cancelled") {
+      list = list.filter((c) => c.status === "cancelled");
       list.sort(
         (a, b) =>
           new Date(b.updated_date) - new Date(a.updated_date)
