@@ -78,8 +78,10 @@ export default function SecureSubmit() {
       for (const c of cases) {
         const document_urls = [];
         for (const f of c.files || []) {
-          const { file_url } = await base44.integrations.Core.UploadFile({ file: f.file });
-          document_urls.push({ name: f.name, url: file_url });
+          // Client documents are legal filings — store them privately so they
+          // are only reachable through a signed link generated for an admin.
+          const { file_uri } = await base44.integrations.Core.UploadPrivateFile({ file: f.file });
+          document_urls.push({ name: f.name, url: file_uri });
         }
         casesPayload.push({
           packageId: c.packageId,

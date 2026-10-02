@@ -92,7 +92,7 @@
       "items": {
         "type": "object"
       },
-      "description": "Array of uploaded document objects {name, url}"
+      "description": "Array of uploaded document objects {name, url}. url is a private file reference opened through a signed admin-only link."
     },
     "status": {
       "type": "string",
@@ -204,5 +204,22 @@
     "service_type",
     "county",
     "respondent_name"
-  ]
+  ],
+  "rls": {
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
 }

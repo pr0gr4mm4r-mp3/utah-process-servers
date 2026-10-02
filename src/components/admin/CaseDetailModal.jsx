@@ -47,6 +47,36 @@ export default function CaseDetailModal({ caseData, onClose, onUpdate }) {
   const [deleting, setDeleting] = useState(false);
   const [activeTab, setActiveTab] = useState("details");
   const [logKey, setLogKey] = useState(0); // used to re-render CaseHistoryLog
+  const [docLoading, setDocLoading] = useState(null);
+
+  // Documents are stored privately, so a fresh signed link is requested
+  // for the admin each time they open one.
+  const openDocument = async (index, name, print = false) => {
+    setDocLoading(`${index}-${print ? "p" : "d"}`);
+    try {
+      const res = await base44.functions.invoke("getDocumentUrl", { caseId: caseData.id, index });
+      const url = res.data?.url;
+      if (!url) throw new Error("No document URL returned");
+
+      if (print) {
+        const win = window.open(url, "_blank");
+        if (win) win.onload = () => win.print();
+      } else {
+        const link = document.createElement("a");
+        link.href = url;
+        link.target = "_blank";
+        link.rel = "noopener";
+        link.download = name || "";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      }
+    } catch (err) {
+      toast.error("Could not open that document. Please try again.");
+    } finally {
+      setDocLoading(null);
+    }
+  };
 
   const handleDelete = async () => {
     if (!window.confirm("Are you sure you want to delete this case? This cannot be undone.")) return;
@@ -335,24 +365,26 @@ Licensed & Bonded in Utah`.trim(),
                             <span className="text-sm font-medium text-foreground truncate">{doc.name}</span>
                           </div>
                           <div className="flex items-center gap-1 ml-3 flex-shrink-0">
-                            <a
-                              href={doc.url}
-                              download={doc.name}
-                              title="Download"
-                              className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                            >
-                              <Download className="w-4 h-4" />
-                            </a>
-                            <button
-                              title="Print"
-                              onClick={() => {
-                                const win = window.open(doc.url, "_blank");
-                                win.onload = () => win.print();
-                              }}
-                              className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                            >
-                              <Printer className="w-4 h-4" />
-                            </button>
+                            {docLoading === `${i}-d` || docLoading === `${i}-p` ? (
+                              <div className="w-4 h-4 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin" />
+                            ) : (
+                              <>
+                                <button
+                                  title="Download"
+                                  onClick={() => openDocument(i, doc.name, false)}
+                                  className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                                >
+                                  <Download className="w-4 h-4" />
+                                </button>
+                                <button
+                                  title="Print"
+                                  onClick={() => openDocument(i, doc.name, true)}
+                                  className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                                >
+                                  <Printer className="w-4 h-4" />
+                                </button>
+                              </>
+                            )}
                           </div>
                         </div>
                       ))}
